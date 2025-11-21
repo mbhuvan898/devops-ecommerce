@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global Styles for a Modern & Premium Admin UI */
+:root {
+  /* Theme variables - default (light) theme */
+  --primary-bg: #ffffff; /* Default page background */
+  --secondary-bg: #f8fafc; /* Slightly off-white for cards/sections */
+  --accent-color: #6366f1; /* Indigo for accents */
+  --text-color-light: #111827; /* Primary text for light backgrounds */
+  --text-color-dark: #6b7280; /* Secondary text color */
+  --border-color: #e5e7eb; /* Subtle border color */
+  --shadow-color: rgba(0, 0, 0, 0.06); /* Soft shadows */
+}
+
+body {
+  font-family: 'Inter', sans-serif; /* Modern sans-serif font */
+  background-color: var(--primary-bg);
+  color: var(--text-color-light);
+}
+
+/* NOTE: If you want a dark theme, add a .dark-theme class to the root element and
+   override these variables there. This keeps components that rely on white
+   backgrounds readable while still allowing a dark mode later. */
+
+/* Custom scrollbar for a sleek look */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--secondary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4f46e5; /* Darker accent on hover */
+}
+
+/* General button styling */
+.btn-primary {
+  background-color: var(--accent-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: #4f46e5;
+  box-shadow: 0 4px 10px var(--shadow-color);
+}
+
+/* Card styling */
+.card {
+  background-color: var(--secondary-bg);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 15px var(--shadow-color);
+  padding: 1.5rem;
+}
+
+/* Input field styling */
+.input-field {
+  background-color: var(--primary-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color-light);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  width: 100%;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5);
+}
+/* Ensures Product Card buttons remain clickable inside react-slick */
+.slick-slide > div {
+    pointer-events: auto !important;
+}
+
+/* Prevent clipping of wishlist buttons or hover animations */
+.slick-slide {
+    overflow: visible !important;
+}
+
+/* Smooth slider spacing */
+.slick-track {
+    display: flex !important;
+    gap: 20px !important;
+}
+/* Ensure slick track uses flex layout and doesn't clip items */
+.slick-track {
+  display: flex !important;
+  align-items: stretch !important;
+  gap: 18px;
+}
+
+/* Let slick slides be auto width so your min-w in Product.jsx works */
+.slick-slide {
+  height: inherit !important;
+  overflow: visible !important;
+}
+
+/* When slick wraps a child, make that child width:auto so min-w takes effect */
+.slick-slide > div {
+  width: auto !important;
+  margin-right: 18px !important;
+  pointer-events: auto !important;
+}

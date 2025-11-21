@@ -1,0 +1,291 @@
+/* File: frontend/src/components/Banner/Banner.css */
+
+/* ============================================
+   MODERN PREMIUM BANNER SLIDER STYLES
+   ============================================ */
+
+/* Arrow Buttons - Modern Circular Design with Enhanced Interactivity */
+.slick-arrow.slick-prev,
+.slick-arrow.slick-next {
+    width: 56px;
+    height: 56px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    z-index: 25;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.slick-arrow.slick-prev {
+    left: 24px;
+}
+
+.slick-arrow.slick-next {
+    right: 24px;
+}
+
+/* Hide default slick arrows */
+.slick-prev::before,
+.slick-next::before {
+    display: none !important;
+}
+
+/* Arrow hover effects - Enhanced for premium feel */
+.slick-arrow.slick-prev:hover,
+.slick-arrow.slick-next:hover {
+    transform: scale(1.15);
+}
+
+.slick-arrow.slick-prev:active,
+.slick-arrow.slick-next:active {
+    transform: scale(0.95);
+}
+
+/* Responsive arrow positioning for mobile */
+@media (max-width: 1024px) {
+    .slick-arrow.slick-prev {
+        left: 16px;
+    }
+    .slick-arrow.slick-next {
+        right: 16px;
+    }
+}
+
+@media (max-width: 640px) {
+    .slick-arrow.slick-prev,
+    .slick-arrow.slick-next {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .slick-arrow.slick-prev {
+        left: 8px;
+    }
+    .slick-arrow.slick-next {
+        right: 8px;
+    }
+}
+
+/* ============================================
+   CUSTOM DOTS STYLING - PREMIUM INDICATORS
+   ============================================ */
+
+.custom-dots {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    z-index: 20;
+}
+
+.custom-dots ul {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.custom-dots li {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.custom-dots li button {
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: block;
+    width: 10px;
+    height: 10px;
+}
+
+/* Active dot styling - Premium animation */
+.custom-dots li.slick-active button {
+    width: 32px;
+    height: 10px;
+    background: white !important;
+    border-radius: 5px;
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.6);
+    animation: dotPulse 0.6s ease-out;
+}
+
+@keyframes dotPulse {
+    0% {
+        width: 10px;
+        opacity: 0.8;
+    }
+    50% {
+        width: 36px;
+    }
+    100% {
+        width: 32px;
+        opacity: 1;
+    }
+}
+
+/* Inactive dots - Smooth transition */
+.custom-dots li button {
+    background: rgba(255, 255, 255, 0.5) !important;
+    border-radius: 5px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-dots li:not(.slick-active) button:hover {
+    background: rgba(255, 255, 255, 0.8) !important;
+    width: 24px;
+}
+
+/* ============================================
+   SLIDER TRANSITIONS - SMOOTH ANIMATIONS
+   ============================================ */
+
+.banner-slider .slick-slide {
+    opacity: 0;
+    transition: opacity 1s cubic-bezier(0.86, 0, 0.07, 1);
+}
+
+.banner-slider .slick-slide.slick-active {
+    opacity: 1;
+    z-index: 10;
+}
+
+.banner-slider .slick-slide.slick-current {
+    z-index: 10;
+}
+
+/* Smooth slide transitions */
+.banner-slider .slick-track {
+    display: flex;
+    transition: transform 1s cubic-bezier(0.86, 0, 0.07, 1);
+}
+
+.banner-slider {
+    position: relative;
+}
+
+/* ============================================
+   LOADING STATE & ACCESSIBILITY
+   ============================================ */
+
+.banner-slider.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.slick-arrow:focus-visible {
+    outline: 2px solid #228B22;
+    outline-offset: 4px;
+    border-radius: 50%;
+}
+
+.custom-dots button:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 3px;
+    border-radius: 50%;
+}
+
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+
+.banner-slider img {
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.banner-slider .slick-list {
+    overflow: hidden;
+    border-radius: 1.5rem;
+}
+
+/* ============================================
+   IMAGE STYLING
+   ============================================ */
+
+.banner-slider img {
+    user-select: none;
+    pointer-events: none;
+    transition: transform 8s ease-out;
+}
+
+/* Subtle zoom effect on active slide */
+.banner-slider .slick-active img {
+    animation: slowZoom 8s ease-out forwards;
+}
+
+@keyframes slowZoom {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.05);
+    }
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+
+.banner-slider .slick-slide:not(.slick-active) {
+    opacity: 0.3;
+}
+
+/* ============================================
+   ACCESSIBILITY IMPROVEMENTS
+   ============================================ */
+
+.slick-arrow:focus {
+    outline: 2px solid #228B22;
+    outline-offset: 4px;
+}
+
+.custom-dots button:focus {
+    outline: 2px solid #228B22;
+    outline-offset: 2px;
+    border-radius: 50%;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+    .slick-arrow.slick-prev,
+    .slick-arrow.slick-next {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .custom-dots li {
+        margin: 0 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Hide arrows on very small screens */
+    .slick-arrow.slick-prev,
+    .slick-arrow.slick-next {
+        opacity: 0.7;
+        width: 36px;
+        height: 36px;
+    }
+    
+    .slick-arrow.slick-prev {
+        left: 8px;
+    }
+    
+    .slick-arrow.slick-next {
+        right: 8px;
+    }
+}

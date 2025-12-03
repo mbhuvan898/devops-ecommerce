@@ -1,5 +1,5 @@
 // =============================
-// 🌍 Load Environment Variables (from root .env)
+// 🌍 Load Environment Variables
 // =============================
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
@@ -9,8 +9,10 @@ require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 // =============================
 const express = require("express");
 const mongoose = require("mongoose");
-const app = require("./backend/app");
-const connectDatabase = require("./backend/config/database");
+
+// ❗ FIXED → Correct backend paths
+const app = require("./app");
+const connectDatabase = require("./config/database");
 
 // =============================
 // ⚙️ Basic Configurations
@@ -37,9 +39,9 @@ connectDatabase();
 __dirname = path.resolve();
 
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "/frontend/build")));
+  app.use(express.static(path.join(__dirname, "../frontend/build")));
   app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"));
+    res.sendFile(path.resolve(__dirname, "../frontend/build/index.html"));
   });
 } else {
   app.get("/", (req, res) => {

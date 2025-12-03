@@ -1,12 +1,19 @@
-FROM node:20-alpine AS build
-WORKDIR /app
-COPY frontend/package*.json ./
-RUN npm install
-COPY frontend/ .
-COPY .env .env
-RUN npm run build
+FROM node:20-alpine
 
-FROM nginx:alpine
-COPY --from=build /app/build /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+WORKDIR /app/frontend
+
+# Copy root package.json first (for caching)
+COPY package*.json ../
+RUN cd .. && npm install
+
+# Copy everything
+COPY . ..
+
+# Copy .env to root
+COPY .env ../.env
+
+# Expose React dev server port
+EXPOSE 3000
+
+# Start exactly like you do: cd frontend && npm start
+CMD ["sh", "-c", "cd /app/frontend && npm start"]

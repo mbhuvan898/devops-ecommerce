@@ -1,8 +1,18 @@
 FROM node:20-alpine
+
 WORKDIR /app
-COPY backend/package*.json ./
+
+# Copy root package.json and install ALL dependencies
+COPY package*.json ./
 RUN npm install --production
-COPY backend/ .
+
+# Copy everything (server.js, routes, etc.)
+COPY . .
+
+# Copy .env
 COPY .env .env
+
 EXPOSE 5000
-CMD ["node", "server.js"]
+
+# Start backend using root package.json
+CMD ["npm", "start"]

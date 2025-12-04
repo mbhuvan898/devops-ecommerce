@@ -1,5 +1,5 @@
 import TextField from '@mui/material/TextField';
-import { Avatar, FormControlLabel, Radio, RadioGroup } from '@mui/material';
+import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,7 +12,6 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 
@@ -31,8 +30,6 @@ const Register = () => {
         password: "",
     });
 
-    const [avatar, setAvatar] = useState("");
-    const [avatarPreview, setAvatarPreview] = useState("");
     const [showPassword, setShowPassword] = useState(false);
 
     const handleRegister = (e) => {
@@ -43,29 +40,11 @@ const Register = () => {
             return;
         }
 
-        const formData = new FormData();
-        formData.set("name", user.name);
-        formData.set("email", user.email);
-        formData.set("gender", user.gender);
-        formData.set("password", user.password);
-        formData.set("avatar", avatar);
-
-        dispatch(registerUser(formData));
+        dispatch(registerUser(user));
     }
 
     const handleDataChange = (e) => {
-        if (e.target.name === "avatar") {
-            const reader = new FileReader();
-            reader.onload = () => {
-                if (reader.readyState === 2) {
-                    setAvatarPreview(reader.result);
-                    setAvatar(reader.result);
-                }
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        } else {
-            setUser({ ...user, [e.target.name]: e.target.value });
-        }
+        setUser({ ...user, [e.target.name]: e.target.value });
     }
 
     useEffect(() => {
@@ -151,28 +130,6 @@ const Register = () => {
                         <div className="px-8 py-10">
                             <form onSubmit={handleRegister} className="space-y-6">
                                 
-                                {/* Avatar Upload */}
-                                <div className="flex flex-col items-center gap-4">
-                                    <Avatar
-                                        src={avatarPreview}
-                                        sx={{ width: 80, height: 80 }}
-                                        className="shadow-xl border-4 border-white ring-2 ring-[#228B22]"
-                                    />
-                                    <label className="cursor-pointer">
-                                        <input
-                                            type="file"
-                                            name="avatar"
-                                            accept="image/*"
-                                            onChange={handleDataChange}
-                                            className="hidden"
-                                        />
-                                        <div className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-xl font-bold text-gray-700 transition-all duration-300 hover:scale-105 shadow-md">
-                                            <CloudUploadIcon />
-                                            Choose Profile Picture
-                                        </div>
-                                    </label>
-                                </div>
-
                                 {/* Name */}
                                 <TextField
                                     fullWidth

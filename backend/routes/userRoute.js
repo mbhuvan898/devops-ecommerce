@@ -14,7 +14,6 @@ const {
     deleteUser 
 } = require('../controllers/userController');
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
-const upload = require('../config/multer');
 
 const router = express.Router();
 
@@ -23,7 +22,7 @@ const router = express.Router();
 // ============================================
 
 // Register new user
-router.route('/register').post(upload.single('avatar'), registerUser);
+router.route('/register').post(registerUser);
 
 // Login user
 router.route('/login').post(loginUser);
@@ -47,8 +46,8 @@ router.route('/me').get(isAuthenticatedUser, getUserDetails);
 // Update user password (when logged in)
 router.route('/password/update').put(isAuthenticatedUser, updatePassword);
 
-// Update user profile (name, email, avatar)
-router.route('/me/update').put(isAuthenticatedUser, upload.single('avatar'), updateProfile);
+// Update user profile (name, email)
+router.route('/me/update').put(isAuthenticatedUser, updateProfile);
 
 // ============================================
 // ADMIN ROUTES (Admin Access Only)

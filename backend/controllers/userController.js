@@ -8,16 +8,13 @@ const crypto = require('crypto');
 // Register User
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {
 
-    const { name, email, gender, password, avatar } = req.body;
+    const { name, email, gender, password } = req.body;
 
     const user = await User.create({
         name,
         email,
         gender,
         password,
-        avatar: {
-            url: avatar || '',
-        },
     });
 
     sendToken(user, 201, res);
@@ -206,12 +203,6 @@ exports.updateProfile = asyncErrorHandler(async (req, res, next) => {
     const newUserData = {
         name: req.body.name,
         email: req.body.email,
-    }
-
-    if(req.body.avatar && req.body.avatar !== "") {
-        newUserData.avatar = {
-            url: req.body.avatar,
-        }
     }
 
     await User.findByIdAndUpdate(req.user.id, newUserData, {

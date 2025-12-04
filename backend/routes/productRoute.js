@@ -14,7 +14,6 @@ const {
     getProductsBySubcategory
 } = require('../controllers/productController');
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
-const upload = require('../config/multer');
 
 const router = express.Router();
 
@@ -31,10 +30,10 @@ router.route('/reviews').get(getProductReviews);
 
 // Admin Routes
 router.route('/admin/products').get(isAuthenticatedUser, authorizeRoles("admin"), getAdminProducts);
-router.route('/admin/product/new').post(isAuthenticatedUser, authorizeRoles("admin"), upload.fields([
-    { name: 'images', maxCount: 5 },
-    { name: 'logo', maxCount: 1 }
-]), createProduct);
+
+// ❗ REMOVED MULTER — Now createProduct must work WITHOUT images
+router.route('/admin/product/new')
+    .post(isAuthenticatedUser, authorizeRoles("admin"), createProduct);
 
 router.route('/admin/product/:id')
     .put(isAuthenticatedUser, authorizeRoles("admin"), updateProduct)

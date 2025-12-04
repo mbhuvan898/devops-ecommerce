@@ -32,7 +32,7 @@ const Account = () => {
       try {
         // Get user orders
         const { data } = await axios.get(
-          "http://localhost:4000/api/v1/orders/me",
+          "/api/v1/orders/me",
           { withCredentials: true }
         );
         setOrderCount(data.orders?.length || 0);
@@ -43,7 +43,7 @@ const Account = () => {
       try {
         // If wishlist endpoint exists, fetch it here
         const wishlistRes = await axios.get(
-          "http://localhost:4000/api/v1/wishlist",
+          "/api/v1/wishlist",
           { withCredentials: true }
         );
         setWishlistCount(wishlistRes.data.wishlist?.length || 0);
@@ -127,17 +127,9 @@ const Account = () => {
               <div className="flex flex-col md:flex-row items-center gap-6">
                 {/* Avatar */}
                 <div className="relative">
-                  {user.avatar && user.avatar.url ? (
-                    <img
-                      src={user.avatar.url}
-                      alt={user.name}
-                      className="w-32 h-32 rounded-full border-4 border-white shadow-xl object-cover"
-                    />
-                  ) : (
-                    <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl bg-white flex items-center justify-center">
-                      <AccountCircleIcon className="text-primary-blue" sx={{ fontSize: 80 }} />
-                    </div>
-                  )}
+                  <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl bg-white flex items-center justify-center">
+                    <AccountCircleIcon className="text-primary-blue" sx={{ fontSize: 80 }} />
+                  </div>
                   <Link
                     to="/account/update"
                     className="absolute bottom-0 right-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100 transition-all"

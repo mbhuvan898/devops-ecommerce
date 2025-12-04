@@ -2,7 +2,6 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:4000",
   "dependencies": {
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
@@ -15,8 +14,8 @@
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^0.25.0",
+    "best2buy": "file:..",
     "chart.js": "^3.7.0",
-  "best2buy": "file:..",
     "framer-motion": "^6.5.1",
     "lucide-react": "^0.552.0",
     "notistack": "^2.0.8",
@@ -63,6 +62,8 @@
     ]
   },
   "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-keywords": "^5.1.0",
     "autoprefixer": "^10.4.2",
     "eslint-config-react-app": "^7.0.1",
     "postcss": "^8.4.5",

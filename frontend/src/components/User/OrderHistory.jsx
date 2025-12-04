@@ -24,7 +24,7 @@ const UserOrderHistory = () => {
       try {
         // ✅ Correct backend endpoint (matches your orderController)
         const { data } = await axios.get(
-          "http://localhost:4000/api/v1/orders/me",
+          "/api/v1/orders/me",
           { withCredentials: true } // important for JWT cookie
         );
 

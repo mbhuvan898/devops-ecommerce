@@ -73,7 +73,7 @@ const Payment = () => {
       }
 
       // 1️⃣ Create Razorpay Order via Backend
-      const { data } = await axios.post("http://localhost:4000/api/v1/payment/process", {
+      const { data } = await axios.post("/api/v1/payment/process", {
         amount: Math.round(totalPrice),
         email: user.email,
         orderId: "OID_" + Date.now(),

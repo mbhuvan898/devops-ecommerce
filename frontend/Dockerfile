@@ -1,18 +1,19 @@
-FROM node:20-alpine
+# Stage 1 — Build React app
+FROM node:20-alpine as build
 
 WORKDIR /app
-
-# Install dependencies
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
-
-# Copy frontend code
 COPY . .
+RUN npm run build
 
-EXPOSE 3000
+# Stage 2 — Serve using NGINX
+FROM nginx:alpine
 
-# Required for React Hot Reload inside Docker
-ENV CHOKIDAR_USEPOLLING=true
+COPY --from=build /app/build /usr/share/nginx/html
 
-CMD ["npm", "start"]
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+
 

@@ -73,16 +73,20 @@ const Payment = () => {
       }
 
       // 1️⃣ Create Razorpay Order via Backend
-      const { data } = await axios.post("/api/v1/payment/process", {
-        amount: Math.round(totalPrice),
-        email: user.email,
-        orderId: "OID_" + Date.now(),
-        name: user.name,
-        address: shippingInfo.address,
-        city: shippingInfo.city,
-        state: shippingInfo.state,
-        pincode: shippingInfo.pincode,
-      });
+      const { data } = await axios.post(
+  `${process.env.REACT_APP_API_URL}/api/v1/payment/process`,
+  {
+    amount: Math.round(totalPrice),
+    email: user.email,
+    orderId: "OID_" + Date.now(),
+    name: user.name,
+    address: shippingInfo.address,
+    city: shippingInfo.city,
+    state: shippingInfo.state,
+    pincode: shippingInfo.pincode,
+  }
+);
+
 
       if (!data.success) throw new Error("Razorpay order creation failed");
 

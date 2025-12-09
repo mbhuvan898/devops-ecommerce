@@ -1,30 +1,25 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import store from './store';
-import { SnackbarProvider } from 'notistack';
+// utils/sendToken.js
 
-import axios from "axios";          // <<< ADD THIS
-axios.defaults.withCredentials = true; // <<< IMPORTANT (send cookies with every request)
+const sendToken = (user, statusCode, res) => {
+    const token = user.getJWTToken();
 
-ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <SnackbarProvider
-        maxSnack={2}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
-      >
-        <Router>
-          <App />
-        </Router>
-      </SnackbarProvider>
-    </Provider>
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+    const options = {
+        expires: new Date(
+            Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+        ),
+        httpOnly: true,
+        sameSite: "none",
+        secure: true
+    };
+
+    res
+        .status(statusCode)
+        .cookie("token", token, options)
+        .json({
+            success: true,
+            user,
+            token,
+        });
+};
+
+module.exports = sendToken;

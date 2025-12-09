@@ -45,8 +45,18 @@ if (process.env.NODE_ENV === "production") {
   // Check if frontend build exists (for monolithic deployment)
   if (fs.existsSync(frontendPath)) {
     console.log("📦 Serving frontend from backend (monolithic mode)");
+    
+    // Serve static files
     app.use(express.static(frontendPath));
-    app.get("*", (req, res) => {
+    
+    // ✅ FIX: Only catch non-API routes
+    app.get("*", (req, res, next) => {
+      // Skip API routes - let them be handled by your API middleware
+      if (req.path.startsWith("/api/")) {
+        return next();
+      }
+      
+      // Serve frontend for all other routes
       res.sendFile(path.resolve(frontendPath, "index.html"));
     });
   } else {

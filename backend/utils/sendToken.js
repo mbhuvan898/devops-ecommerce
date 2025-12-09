@@ -1,5 +1,3 @@
-// utils/sendToken.js
-
 const sendToken = (user, statusCode, res) => {
     const token = user.getJWTToken();
 
@@ -8,8 +6,8 @@ const sendToken = (user, statusCode, res) => {
             Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
         ),
         httpOnly: true,
-        sameSite: "none",
-        secure: true
+        sameSite: "lax",   // allow cookies to work over HTTP
+        secure: false      // must be false because you are NOT using HTTPS
     };
 
     res

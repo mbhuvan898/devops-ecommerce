@@ -17,9 +17,10 @@ app.use("/api/v1/stripe/webhook", express.raw({ type: "application/json" }));
 // Allow EC2 frontend: http://18.61.24.131
 // Allow localhost for development
 const allowedOrigins = [
-  "http://18.61.24.131", // EC2 frontend
-  "http://localhost:3000", // Local dev
-  "http://best2buy.excomeco.dpdns.org", // Cloudflare domain (IMPORTANT)
+  "http://18.61.24.131",
+  "http://localhost:3000",
+  "http://best2buy.excomeco.dpdns.org",
+  "https://best2buy.excomeco.dpdns.org",  // <<< THIS WAS MISSING
 ];
 
 app.use(

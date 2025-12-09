@@ -1,5 +1,5 @@
 // ===============================================
-// 💳 Modern Razorpay + COD Payment Page (Final Version)
+// 💳 Modern Razorpay + COD Payment Page (Final + AWS Corrected)
 // ===============================================
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,6 +17,8 @@ import MetaData from "../Layouts/MetaData";
 import { motion } from "framer-motion";
 import { RadioGroup, FormControlLabel, Radio } from "@mui/material";
 
+const API_BASE = "/api/v1";   // ⭐ FIX — BACKEND INTERNAL
+
 const Payment = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -29,10 +31,14 @@ const Payment = () => {
   const [paymentMethod, setPaymentMethod] = useState("razorpay");
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalPrice = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
   const order = { shippingInfo, orderItems: cartItems, totalPrice };
 
-  // 🧾 Handle Errors
+  // 🧾 Error handling
   useEffect(() => {
     if (error) {
       enqueueSnackbar(error, { variant: "error" });
@@ -40,57 +46,65 @@ const Payment = () => {
     }
   }, [dispatch, error, enqueueSnackbar]);
 
-  // ⚙️ Load Razorpay Checkout Script
+  // ⚙️ Load Razorpay script
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
+
     script.onload = () => {
-      console.log("✅ Razorpay script loaded successfully");
+      console.log("Razorpay script loaded");
       setRazorpayLoaded(true);
     };
+
     script.onerror = () => {
-      enqueueSnackbar("Failed to load Razorpay. Check your connection.", { variant: "error" });
+      enqueueSnackbar("Failed to load Razorpay!", { variant: "error" });
     };
+
     document.body.appendChild(script);
   }, [enqueueSnackbar]);
 
   // 💵 Cash on Delivery
   const handleCOD = () => {
-    order.paymentInfo = { id: "COD", status: "Pending", method: "COD" };
+    order.paymentInfo = {
+      id: "COD",
+      status: "Pending",
+      method: "COD",
+    };
+
     dispatch(newOrder(order));
     dispatch(emptyCart());
-    enqueueSnackbar("Order placed with Cash on Delivery!", { variant: "success" });
+
+    enqueueSnackbar("COD order placed!", { variant: "success" });
+
     navigate("/order/success?status=success&method=cod");
   };
 
-  // 💳 Razorpay Payment Flow
+  // 💳 Razorpay flow
   const handleRazorpayPayment = async () => {
     try {
       if (!razorpayLoaded) {
-        enqueueSnackbar("Razorpay is still loading... please wait.", { variant: "warning" });
+        enqueueSnackbar("Razorpay still loading...", { variant: "warning" });
         return;
       }
 
-      // 1️⃣ Create Razorpay Order via Backend
-      const { data } = await axios.post(
-  `${process.env.REACT_APP_API_URL}/api/v1/payment/process`,
-  {
-    amount: Math.round(totalPrice),
-    email: user.email,
-    orderId: "OID_" + Date.now(),
-    name: user.name,
-    address: shippingInfo.address,
-    city: shippingInfo.city,
-    state: shippingInfo.state,
-    pincode: shippingInfo.pincode,
-  }
-);
+      // 1️⃣ Create Razorpay order in backend
+      const { data } = await axios.post(`${API_BASE}/payment/process`, {
+        amount: Math.round(totalPrice),
+        email: user.email,
+        orderId: "OID_" + Date.now(),
+        name: user.name,
+        address: shippingInfo.address,
+        city: shippingInfo.city,
+        state: shippingInfo.state,
+        pincode: shippingInfo.pincode,
+      });
 
+      if (!data.success) {
+        throw new Error("Failed to create Razorpay order");
+      }
 
-      if (!data.success) throw new Error("Razorpay order creation failed");
-
-      // 2️⃣ Razorpay Checkout Options
+      // 2️⃣ Razorpay options
       const options = {
         key: data.key_id,
         amount: data.order.amount,
@@ -106,8 +120,10 @@ const Payment = () => {
               status: "succeeded",
               method: "razorpay",
             };
+
             await dispatch(newOrder(order));
             await dispatch(emptyCart());
+
             enqueueSnackbar("Payment successful!", { variant: "success" });
 
             setTimeout(() => {
@@ -125,17 +141,16 @@ const Payment = () => {
         notes: { address: shippingInfo.address },
         theme: { color: "#2563EB" },
         modal: {
-          ondismiss: function () {
+          ondismiss: () => {
             enqueueSnackbar("Payment cancelled!", { variant: "warning" });
             navigate("/order/success?status=failed&method=razorpay");
           },
         },
       };
 
-      const razorpayInstance = new window.Razorpay(options);
-      razorpayInstance.open();
+      new window.Razorpay(options).open();
     } catch (err) {
-      console.error("❌ Razorpay Init Error:", err.response?.data || err.message);
+      console.error("Razorpay Error:", err.message);
       enqueueSnackbar("Payment initialization failed!", { variant: "error" });
     }
   };
@@ -143,6 +158,7 @@ const Payment = () => {
   return (
     <>
       <MetaData title="Best2Buy | Secure Payment" />
+
       <main className="w-full mt-20 min-h-screen bg-gray-50 pb-10">
         <div className="flex flex-col sm:flex-row gap-6 w-full sm:w-11/12 m-auto">
           {/* Payment Section */}
@@ -167,66 +183,18 @@ const Payment = () => {
                   <FormControlLabel
                     value="razorpay"
                     control={<Radio sx={{ color: "#2563EB" }} />}
-                    label={
-                      <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        className={`flex items-center justify-between px-4 py-4 rounded-lg border-2 transition ${
-                          paymentMethod === "razorpay"
-                            ? "border-blue-600 bg-blue-50"
-                            : "border-gray-300"
-                        }`}
-                      >
-                        <div className="flex items-center gap-4">
-                          <img
-                            src="https://cdn.razorpay.com/static/assets/logo/payment.svg"
-                            alt="Razorpay"
-                            className="h-8 object-contain"
-                          />
-                          <div>
-                            <h4 className="font-semibold text-gray-800">Pay with Razorpay</h4>
-                            <p className="text-sm text-gray-500">
-                              Credit / Debit / UPI / Wallets — Secure
-                            </p>
-                          </div>
-                        </div>
-                        <span className="text-sm text-gray-500">Secure 🔒</span>
-                      </motion.div>
-                    }
+                    label="Pay with Razorpay"
                   />
 
-                  {/* Cash on Delivery */}
+                  {/* COD */}
                   <FormControlLabel
                     value="cod"
                     control={<Radio sx={{ color: "#16A34A" }} />}
-                    label={
-                      <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        className={`flex items-center justify-between px-4 py-4 rounded-lg border-2 transition ${
-                          paymentMethod === "cod"
-                            ? "border-green-600 bg-green-50"
-                            : "border-gray-300"
-                        }`}
-                      >
-                        <div className="flex items-center gap-4">
-                          <img
-                            src="https://cdn-icons-png.flaticon.com/512/639/639365.png"
-                            alt="COD"
-                            className="h-8 w-8 object-contain"
-                          />
-                          <div>
-                            <h4 className="font-semibold text-gray-800">Cash on Delivery</h4>
-                            <p className="text-sm text-gray-500">
-                              Pay when you receive the order
-                            </p>
-                          </div>
-                        </div>
-                        <span className="text-sm text-gray-500">No Card Needed 💵</span>
-                      </motion.div>
-                    }
+                    label="Cash on Delivery"
                   />
                 </RadioGroup>
 
-                {/* Button */}
+                {/* Action Button */}
                 <div className="mt-8">
                   {paymentMethod === "cod" ? (
                     <button

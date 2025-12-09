@@ -12,21 +12,21 @@ const app = express();
 app.use("/api/v1/stripe/webhook", express.raw({ type: "application/json" }));
 
 // =============================
-// 🔓 Enable CORS for production frontend
+// 🔓 CORS CONFIG (IMPORTANT)
 // =============================
-// Allow EC2 frontend: http://18.61.24.131
-// Allow localhost for development
+
+const mainFrontend = process.env.FRONTEND_URL || "http://localhost:3000";
+
 const allowedOrigins = [
-  "http://18.61.24.131",
+  mainFrontend,
   "http://localhost:3000",
-  "http://best2buy.excomeco.dpdns.org",
-  "https://best2buy.excomeco.dpdns.org",  // <<< THIS WAS MISSING
+  "http://localhost:5173",
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // allow Postman / curl
+      if (!origin) return callback(null, true); // allows Postman/curl/server-side
 
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
@@ -40,7 +40,6 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
 
 // =============================
 // 📦 Body parsers & cookies
@@ -67,6 +66,15 @@ app.use("/api/v1", user);
 app.use("/api/v1", product);
 app.use("/api/v1", order);
 app.use("/api/v1", payment);
+
+// Health check route
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "🚀 Best2Buy API Server",
+    env: process.env.NODE_ENV || "development",
+  });
+});
 
 // =============================
 // ⚠️ Global Error Middleware

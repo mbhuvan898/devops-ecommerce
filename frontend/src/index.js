@@ -7,6 +7,9 @@ import { Provider } from 'react-redux';
 import store from './store';
 import { SnackbarProvider } from 'notistack';
 
+import axios from "axios";          // <<< ADD THIS
+axios.defaults.withCredentials = true; // <<< IMPORTANT (send cookies with every request)
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>

@@ -86,13 +86,10 @@ exports.getSingleOrderDetails = asyncErrorHandler(async (req, res, next) => {
 exports.myOrders = asyncErrorHandler(async (req, res, next) => {
     const orders = await Order.find({ user: req.user._id });
 
-    if (!orders || orders.length === 0) {
-        return next(new ErrorHandler("No orders found", 404));
-    }
-
+    // Return empty array instead of 404 error
     res.status(200).json({
         success: true,
-        orders,
+        orders: orders || [],
     });
 });
 

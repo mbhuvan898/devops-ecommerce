@@ -25,7 +25,7 @@ import {
 } from "../constants/orderConstants";
 
 // FINAL FIX: Full backend API URL
-const API_BASE = "http://18.61.35.239:4000/api/v1";
+const API_BASE = "/api/v1";
 
 
 // -------------------------------------------------

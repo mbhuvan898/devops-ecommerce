@@ -24,6 +24,7 @@ import {
     UPDATE_ORDER_SUCCESS,
 } from "../constants/orderConstants";
 
+// Correct backend base route
 const API_BASE = "/api/v1";
 
 
@@ -47,6 +48,7 @@ export const newOrder = (order) => async (dispatch) => {
             type: NEW_ORDER_SUCCESS,
             payload: data,
         });
+
     } catch (error) {
         dispatch({
             type: NEW_ORDER_FAIL,
@@ -72,6 +74,7 @@ export const myOrders = () => async (dispatch) => {
             type: MY_ORDERS_SUCCESS,
             payload: data.orders,
         });
+
     } catch (error) {
         dispatch({
             type: MY_ORDERS_FAIL,
@@ -82,7 +85,7 @@ export const myOrders = () => async (dispatch) => {
 
 
 // -------------------------------------------------
-// Get order details
+// Get single order details
 // -------------------------------------------------
 export const getOrderDetails = (id) => async (dispatch) => {
     try {
@@ -97,6 +100,7 @@ export const getOrderDetails = (id) => async (dispatch) => {
             type: ORDER_DETAILS_SUCCESS,
             payload: data.order,
         });
+
     } catch (error) {
         dispatch({
             type: ORDER_DETAILS_FAIL,
@@ -107,8 +111,112 @@ export const getOrderDetails = (id) => async (dispatch) => {
 
 
 // -------------------------------------------------
-// Clear errors
+// Get payment status
 // -------------------------------------------------
-export const clearErrors = () => (dispatch) => {
-    dispatch({ type: CLEAR_ERRORS });
+export const getPaymentStatus = (id) => async (dispatch) => {
+    try {
+        dispatch({ type: PAYMENT_STATUS_REQUEST });
+
+        const { data } = await axios.get(
+            `${API_BASE}/payment/status/${id}`,
+            { withCredentials: true }
+        );
+
+        dispatch({
+            type: PAYMENT_STATUS_SUCCESS,
+            payload: data.txn,
+        });
+
+    } catch (error) {
+        dispatch({
+            type: PAYMENT_STATUS_FAIL,
+            payload: error.response?.data?.message,
+        });
+    }
 };
+
+
+// -------------------------------------------------
+// ADMIN: Get all orders
+// -------------------------------------------------
+export const getAllOrders = () => async (dispatch) => {
+    try {
+        dispatch({ type: ALL_ORDERS_REQUEST });
+
+        const { data } = await axios.get(
+            `${API_BASE}/admin/orders`,
+            { withCredentials: true }
+        );
+
+        dispatch({
+            type: ALL_ORDERS_SUCCESS,
+            payload: data.orders,
+        });
+
+    } catch (error) {
+        dispatch({
+            type: ALL_ORDERS_FAIL,
+            payload: error.response?.data?.message,
+        });
+    }
+};
+
+
+// -------------------------------------------------
+// ADMIN: Update order
+// -------------------------------------------------
+export const updateOrder = (id, orderData) => async (dispatch) => {
+    try {
+        dispatch({ type: UPDATE_ORDER_REQUEST });
+
+        const { data } = await axios.put(
+            `${API_BASE}/admin/order/${id}`,
+            orderData,
+            {
+                headers: { "Content-Type": "application/json" },
+                withCredentials: true,
+            }
+        );
+
+        dispatch({
+            type: UPDATE_ORDER_SUCCESS,
+            payload: data.success,
+        });
+
+    } catch (error) {
+        dispatch({
+            type: UPDATE_ORDER_FAIL,
+            payload: error.response?.data?.message,
+        });
+    }
+};
+
+
+// -------------------------------------------------
+// ADMIN: Delete order
+// -------------------------------------------------
+export const deleteOrder = (id) => async (dispatch) => {
+    try {
+        dispatch({ type: DELETE_ORDER_REQUEST });
+
+        const { data } = await axios.delete(
+            `${API_BASE}/admin/order/${id}`,
+            { withCredentials: true }
+        );
+
+        dispatch({
+            type: DELETE_ORDER_SUCCESS,
+            payload: data.success,
+        });
+
+    } catch (error) {
+        dispatch({
+            type: DELETE_ORDER_FAIL,
+            payload: error.response?.data?.message,
+        });
+    }
+};
+
+
+
+

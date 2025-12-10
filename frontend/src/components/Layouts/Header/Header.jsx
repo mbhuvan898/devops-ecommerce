@@ -80,7 +80,10 @@ const Header = () => {
               onMouseLeave={() => setTogglePrimaryDropDown(false)}
             >
               <span className="flex items-center text-white font-semibold gap-1 cursor-pointer text-sm whitespace-nowrap">
-                {user.name && user.name.split(" ", 1)}
+                
+                {/* FIXED: Safe user name */}
+                {user?.name?.split(" ", 1) || "User"}
+
                 {togglePrimaryDropDown ? (
                   <ExpandLessIcon sx={{ fontSize: 18 }} />
                 ) : (
@@ -93,7 +96,7 @@ const Header = () => {
               {togglePrimaryDropDown && (
                 <PrimaryDropDownMenu
                   setTogglePrimaryDropDown={setTogglePrimaryDropDown}
-                  user={user}
+                  user={user}   // SAFE: user may be undefined
                 />
               )}
             </div>

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ADD_TO_WISHLIST, REMOVE_FROM_WISHLIST } from "../constants/wishlistConstants";
 
-const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:4000";
+const API_BASE = "/api/v1"; 
 
 // Add To Wishlist
 export const addToWishlist = (id) => async (dispatch, getState) => {

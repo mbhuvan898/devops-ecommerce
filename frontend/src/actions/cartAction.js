@@ -5,12 +5,11 @@ import {
     REMOVE_FROM_CART,
     SAVE_SHIPPING_INFO,
 } from "../constants/cartConstants";
-
-const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:4000";
+const API_BASE = "/api/v1";
 
 // Add item to cart
 export const addItemsToCart = (id, quantity = 1) => async (dispatch, getState) => {
-    const { data } = await axios.get(`${API_BASE}/api/v1/product/${id}`);
+    const { data } = await axios.get(`${API_BASE}/product/${id}`);
 
     dispatch({
         type: ADD_TO_CART,
@@ -28,6 +27,8 @@ export const addItemsToCart = (id, quantity = 1) => async (dispatch, getState) =
 
     localStorage.setItem("cartItems", JSON.stringify(getState().cart.cartItems));
 };
+
+
 
 // Remove item from cart
 export const removeItemsFromCart = (id) => async (dispatch, getState) => {

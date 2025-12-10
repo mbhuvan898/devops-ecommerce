@@ -39,8 +39,9 @@ import {
 
 import axios from 'axios';
 
-// 🌍 BASE URL inside Docker
-const API_BASE = process.env.REACT_APP_API_URL;
+// ✔ Base URL for all user APIs inside ALB
+const API_BASE = "/api/v1";
+
 
 // -------------------------------
 // LOGIN USER
@@ -55,7 +56,7 @@ export const loginUser = (email, password) => async (dispatch) => {
         };
 
         const { data } = await axios.post(
-            `${API_BASE}/api/v1/login`,
+            `${API_BASE}/login`,
             { email, password },
             config
         );
@@ -73,6 +74,7 @@ export const loginUser = (email, password) => async (dispatch) => {
     }
 };
 
+
 // -------------------------------
 // REGISTER USER
 // -------------------------------
@@ -86,7 +88,7 @@ export const registerUser = (userData) => async (dispatch) => {
         };
 
         const { data } = await axios.post(
-            `${API_BASE}/api/v1/register`,
+            `${API_BASE}/register`,
             userData,
             config
         );
@@ -104,14 +106,15 @@ export const registerUser = (userData) => async (dispatch) => {
     }
 };
 
+
 // -------------------------------
-// LOAD USER
+// LOAD USER DETAILS
 // -------------------------------
 export const loadUser = () => async (dispatch) => {
     try {
         dispatch({ type: LOAD_USER_REQUEST });
 
-        const { data } = await axios.get(`${API_BASE}/api/v1/me`, {
+        const { data } = await axios.get(`${API_BASE}/me`, {
             withCredentials: true,
         });
 
@@ -128,12 +131,13 @@ export const loadUser = () => async (dispatch) => {
     }
 };
 
+
 // -------------------------------
 // LOGOUT USER
 // -------------------------------
 export const logoutUser = () => async (dispatch) => {
     try {
-        await axios.get(`${API_BASE}/api/v1/logout`, { withCredentials: true });
+        await axios.get(`${API_BASE}/logout`, { withCredentials: true });
         dispatch({ type: LOGOUT_USER_SUCCESS });
 
     } catch (error) {
@@ -143,6 +147,7 @@ export const logoutUser = () => async (dispatch) => {
         });
     }
 };
+
 
 // -------------------------------
 // UPDATE PROFILE
@@ -157,7 +162,7 @@ export const updateProfile = (userData) => async (dispatch) => {
         };
 
         const { data } = await axios.put(
-            `${API_BASE}/api/v1/me/update`,
+            `${API_BASE}/me/update`,
             userData,
             config
         );
@@ -175,6 +180,7 @@ export const updateProfile = (userData) => async (dispatch) => {
     }
 };
 
+
 // -------------------------------
 // UPDATE PASSWORD
 // -------------------------------
@@ -188,7 +194,7 @@ export const updatePassword = (passwords) => async (dispatch) => {
         };
 
         const { data } = await axios.put(
-            `${API_BASE}/api/v1/password/update`,
+            `${API_BASE}/password/update`,
             passwords,
             config
         );
@@ -205,6 +211,7 @@ export const updatePassword = (passwords) => async (dispatch) => {
         });
     }
 };
+
 
 // -------------------------------
 // FORGOT PASSWORD
@@ -223,7 +230,7 @@ export const forgotPassword = (emailData) => async (dispatch) => {
         };
 
         const { data } = await axios.post(
-            `${API_BASE}/api/v1/password/forgot`,
+            `${API_BASE}/password/forgot`,
             { email: emailValue },
             config
         );
@@ -241,6 +248,7 @@ export const forgotPassword = (emailData) => async (dispatch) => {
     }
 };
 
+
 // -------------------------------
 // RESET PASSWORD
 // -------------------------------
@@ -253,7 +261,7 @@ export const resetPassword = (token, passwords) => async (dispatch) => {
         };
 
         const { data } = await axios.put(
-            `${API_BASE}/api/v1/password/reset/${token}`,
+            `${API_BASE}/password/reset/${token}`,
             passwords,
             config
         );
@@ -271,6 +279,7 @@ export const resetPassword = (token, passwords) => async (dispatch) => {
     }
 };
 
+
 // -------------------------------
 // ADMIN – GET ALL USERS
 // -------------------------------
@@ -278,7 +287,7 @@ export const getAllUsers = () => async (dispatch) => {
     try {
         dispatch({ type: ALL_USERS_REQUEST });
 
-        const { data } = await axios.get(`${API_BASE}/api/v1/admin/users`, {
+        const { data } = await axios.get(`${API_BASE}/admin/users`, {
             withCredentials: true,
         });
 
@@ -295,6 +304,7 @@ export const getAllUsers = () => async (dispatch) => {
     }
 };
 
+
 // -------------------------------
 // ADMIN – GET USER DETAILS
 // -------------------------------
@@ -302,7 +312,7 @@ export const getUserDetails = (id) => async (dispatch) => {
     try {
         dispatch({ type: USER_DETAILS_REQUEST });
 
-        const { data } = await axios.get(`${API_BASE}/api/v1/admin/user/${id}`);
+        const { data } = await axios.get(`${API_BASE}/admin/user/${id}`);
 
         dispatch({
             type: USER_DETAILS_SUCCESS,
@@ -317,6 +327,7 @@ export const getUserDetails = (id) => async (dispatch) => {
     }
 };
 
+
 // -------------------------------
 // ADMIN – UPDATE USER
 // -------------------------------
@@ -329,7 +340,7 @@ export const updateUser = (id, userData) => async (dispatch) => {
         };
 
         const { data } = await axios.put(
-            `${API_BASE}/api/v1/admin/user/${id}`,
+            `${API_BASE}/admin/user/${id}`,
             userData,
             config
         );
@@ -347,6 +358,7 @@ export const updateUser = (id, userData) => async (dispatch) => {
     }
 };
 
+
 // -------------------------------
 // ADMIN – DELETE USER
 // -------------------------------
@@ -355,7 +367,7 @@ export const deleteUser = (id) => async (dispatch) => {
         dispatch({ type: DELETE_USER_REQUEST });
 
         const { data } = await axios.delete(
-            `${API_BASE}/api/v1/admin/user/${id}`
+            `${API_BASE}/admin/user/${id}`
         );
 
         dispatch({
@@ -370,6 +382,7 @@ export const deleteUser = (id) => async (dispatch) => {
         });
     }
 };
+
 
 // -------------------------------
 // CLEAR ERRORS

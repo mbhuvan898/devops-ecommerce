@@ -67,6 +67,11 @@ app.use("/api/v1", product);
 app.use("/api/v1", order);
 app.use("/api/v1", payment);
 
+// Health check route for ALB
+app.get("/api/v1/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 // Health check route
 app.get("/", (req, res) => {
   res.json({

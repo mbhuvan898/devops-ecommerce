@@ -8,7 +8,6 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import CloseIcon from '@mui/icons-material/Close';
-import Avatar from '@mui/material/Avatar';
 import { useDispatch, useSelector } from 'react-redux';
 import './Sidebar.css';
 import { useSnackbar } from 'notistack';
@@ -74,11 +73,9 @@ const Sidebar = ({ activeTab, setToggleSidebar }) => {
         <aside className="sidebar z-10 sm:z-0 block min-h-screen fixed left-0 pb-14 max-h-screen w-3/4 sm:w-1/5 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white overflow-x-hidden border-r border-gray-700 shadow-2xl">
             {/* User Profile Card */}
             <div className="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-xl shadow-lg my-4 mx-3.5">
-                <Avatar
-                    alt="Avatar"
-                    src={user.avatar.url}
-                    sx={{ width: 48, height: 48, border: '2px solid white' }}
-                />
+                <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-xl font-bold border-2 border-white">
+                    {user?.name?.charAt(0).toUpperCase() || "U"}
+                </div>
                 <div className="flex flex-col gap-0 flex-1">
                     <span className="font-semibold text-base">{user.name}</span>
                     <span className="text-blue-100 text-xs">{user.email}</span>
@@ -133,13 +130,13 @@ const Sidebar = ({ activeTab, setToggleSidebar }) => {
                         rel="noreferrer" 
                         className="font-semibold text-base hover:text-blue-400 transition-colors"
                     >
-                        Jigar Sable
+                        mbhuvan
                     </a>
                     <a 
                         href="mailto:jigarsable21@gmail.com" 
                         className="text-gray-400 text-xs hover:text-blue-400 transition-colors"
                     >
-                        jigarsable21@gmail.com
+                        mbhuvn898@gmail.com
                     </a>
                 </div>
             </div>

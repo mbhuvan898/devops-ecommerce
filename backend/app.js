@@ -7,82 +7,79 @@ const errorMiddleware = require("./middlewares/error");
 const app = express();
 
 // =============================
-// 🧾 Stripe raw body parser (must be before JSON parser)
+// 🧾 Stripe raw body parser
 // =============================
 app.use("/api/v1/stripe/webhook", express.raw({ type: "application/json" }));
 
 // =============================
-// 🔓 CORS CONFIG (IMPORTANT)
+// 🔓 FIXED CORS CONFIG
 // =============================
 
-const mainFrontend = process.env.FRONTEND_URL || "http://localhost:3000";
+// Your frontend URL from EC2
+const mainFrontend = process.env.FRONTEND_URL || "http://18.61.35.239";
 
+// Allowed origins list
 const allowedOrigins = [
-  mainFrontend,
-  "http://localhost:3000",
-  "http://localhost:5173",
+    mainFrontend,
+    "http://18.61.35.239",
+    "http://18.61.35.239:80",
+    "http://localhost:3000",
+    "http://localhost:5173",
 ];
 
+// ⭐ IMPORTANT: THIS IS THE CORRECT WAY
 app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // allows Postman/curl/server-side
-
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.log("❌ Blocked by CORS:", origin);
-        callback(new Error("Not allowed by CORS: " + origin));
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
+    cors({
+        origin: allowedOrigins,
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+    })
 );
 
 // =============================
-// 📦 Body parsers & cookies
+// 📦 Parsers & cookies
 // =============================
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 
 // =============================
-// 📁 Static uploads folder
+// 📁 Static uploads
 // =============================
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // =============================
-// 🚦 Import Routes
+// 🚦 Routes
 // =============================
 const user = require("./routes/userRoute");
 const product = require("./routes/productRoute");
 const order = require("./routes/orderRoute");
 const payment = require("./routes/paymentRoute");
 
-// API Routes
 app.use("/api/v1", user);
 app.use("/api/v1", product);
 app.use("/api/v1", order);
 app.use("/api/v1", payment);
 
-// Health check route for ALB
+// =============================
+// ❤️ Health Check
+// =============================
 app.get("/api/v1/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
+    res.status(200).json({ status: "ok" });
 });
 
-// Health check route
+// Root
 app.get("/", (req, res) => {
-  res.json({
-    success: true,
-    message: "🚀 Best2Buy API Server",
-    env: process.env.NODE_ENV || "development",
-  });
+    res.json({
+        success: true,
+        message: "🚀 Best2Buy API Server",
+        env: process.env.NODE_ENV || "development",
+    });
 });
 
 // =============================
-// ⚠️ Global Error Middleware
+// ⚠️ Error Middleware
 // =============================
 app.use(errorMiddleware);
 

@@ -24,7 +24,6 @@ import {
     UPDATE_ORDER_SUCCESS,
 } from "../constants/orderConstants";
 
-// FINAL FIX: Full backend API URL
 const API_BASE = "/api/v1";
 
 
@@ -56,6 +55,7 @@ export const newOrder = (order) => async (dispatch) => {
     }
 };
 
+
 // -------------------------------------------------
 // Get logged-in user's orders
 // -------------------------------------------------
@@ -80,8 +80,9 @@ export const myOrders = () => async (dispatch) => {
     }
 };
 
+
 // -------------------------------------------------
-// Get single order details
+// Get order details
 // -------------------------------------------------
 export const getOrderDetails = (id) => async (dispatch) => {
     try {
@@ -104,105 +105,6 @@ export const getOrderDetails = (id) => async (dispatch) => {
     }
 };
 
-// -------------------------------------------------
-// Get payment status
-// -------------------------------------------------
-export const getPaymentStatus = (id) => async (dispatch) => {
-    try {
-        dispatch({ type: PAYMENT_STATUS_REQUEST });
-
-        const { data } = await axios.get(
-            `${API_BASE}/payment/status/${id}`,
-            { withCredentials: true }
-        );
-
-        dispatch({
-            type: PAYMENT_STATUS_SUCCESS,
-            payload: data.txn,
-        });
-    } catch (error) {
-        dispatch({
-            type: PAYMENT_STATUS_FAIL,
-            payload: error.response?.data?.message,
-        });
-    }
-};
-
-// -------------------------------------------------
-// ADMIN: Get all orders
-// -------------------------------------------------
-export const getAllOrders = () => async (dispatch) => {
-    try {
-        dispatch({ type: ALL_ORDERS_REQUEST });
-
-        const { data } = await axios.get(
-            `${API_BASE}/admin/orders`,
-            { withCredentials: true }
-        );
-
-        dispatch({
-            type: ALL_ORDERS_SUCCESS,
-            payload: data.orders,
-        });
-    } catch (error) {
-        dispatch({
-            type: ALL_ORDERS_FAIL,
-            payload: error.response?.data?.message,
-        });
-    }
-};
-
-// -------------------------------------------------
-// ADMIN: Update order
-// -------------------------------------------------
-export const updateOrder = (id, order) => async (dispatch) => {
-    try {
-        dispatch({ type: UPDATE_ORDER_REQUEST });
-
-        const { data } = await axios.put(
-            `${API_BASE}/admin/order/${id}`,
-            order,
-            {
-                headers: { "Content-Type": "application/json" },
-                withCredentials: true,
-            }
-        );
-
-        dispatch({
-            type: UPDATE_ORDER_SUCCESS,
-            payload: data.success,
-        });
-    } catch (error) {
-        dispatch({
-            type: UPDATE_ORDER_FAIL,
-            payload: error.response?.data?.message,
-        });
-    }
-};
-
-// -------------------------------------------------
-// ADMIN: Delete order
-// -------------------------------------------------
-export const deleteOrder = (id) => async (dispatch) => {
-    try {
-        dispatch({ type: DELETE_ORDER_REQUEST });
-
-        const { data } = await axios.delete(
-            `${API_BASE}/admin/order/${id}`,
-            { withCredentials: true }
-        );
-
-        dispatch({
-            type: DELETE_ORDER_SUCCESS,
-            payload: data.success,
-        });
-    } catch (error) {
-        dispatch({
-            type: DELETE_ORDER_FAIL,
-            payload: error.response?.data?.message,
-        });
-    }
-};
 
 // -------------------------------------------------
 // Clear errors

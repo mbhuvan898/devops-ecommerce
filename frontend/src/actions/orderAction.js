@@ -24,7 +24,8 @@ import {
     UPDATE_ORDER_SUCCESS,
 } from "../constants/orderConstants";
 
-const API_BASE = "/api/v1";
+// FINAL FIX: Full backend API URL
+const API_BASE = "http://18.61.35.239:4000/api/v1";
 
 
 // -------------------------------------------------
@@ -35,7 +36,7 @@ export const newOrder = (order) => async (dispatch) => {
         dispatch({ type: NEW_ORDER_REQUEST });
 
         const { data } = await axios.post(
-            `${API_BASE}/api/v1/order/new`,
+            `${API_BASE}/order/new`,
             order,
             {
                 headers: { "Content-Type": "application/json" },
@@ -63,7 +64,7 @@ export const myOrders = () => async (dispatch) => {
         dispatch({ type: MY_ORDERS_REQUEST });
 
         const { data } = await axios.get(
-            `${API_BASE}/api/v1/orders/me`,
+            `${API_BASE}/orders/me`,
             { withCredentials: true }
         );
 
@@ -87,7 +88,7 @@ export const getOrderDetails = (id) => async (dispatch) => {
         dispatch({ type: ORDER_DETAILS_REQUEST });
 
         const { data } = await axios.get(
-            `${API_BASE}/api/v1/order/${id}`,
+            `${API_BASE}/order/${id}`,
             { withCredentials: true }
         );
 
@@ -111,7 +112,7 @@ export const getPaymentStatus = (id) => async (dispatch) => {
         dispatch({ type: PAYMENT_STATUS_REQUEST });
 
         const { data } = await axios.get(
-            `${API_BASE}/api/v1/payment/status/${id}`,
+            `${API_BASE}/payment/status/${id}`,
             { withCredentials: true }
         );
 
@@ -135,7 +136,7 @@ export const getAllOrders = () => async (dispatch) => {
         dispatch({ type: ALL_ORDERS_REQUEST });
 
         const { data } = await axios.get(
-            `${API_BASE}/api/v1/admin/orders`,
+            `${API_BASE}/admin/orders`,
             { withCredentials: true }
         );
 
@@ -159,7 +160,7 @@ export const updateOrder = (id, order) => async (dispatch) => {
         dispatch({ type: UPDATE_ORDER_REQUEST });
 
         const { data } = await axios.put(
-            `${API_BASE}/api/v1/admin/order/${id}`,
+            `${API_BASE}/admin/order/${id}`,
             order,
             {
                 headers: { "Content-Type": "application/json" },
@@ -187,7 +188,7 @@ export const deleteOrder = (id) => async (dispatch) => {
         dispatch({ type: DELETE_ORDER_REQUEST });
 
         const { data } = await axios.delete(
-            `${API_BASE}/api/v1/admin/order/${id}`,
+            `${API_BASE}/admin/order/${id}`,
             { withCredentials: true }
         );
 

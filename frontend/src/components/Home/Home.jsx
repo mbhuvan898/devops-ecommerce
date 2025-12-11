@@ -440,69 +440,67 @@ const Home = () => {
         )}
 
         {/* CTA BANNER */}
-        <section className="relative py-20 bg-gradient-to-r from-[#1a5f1a] via-[#228B22] to-[#2e7d32] overflow-hidden">
-          <div className="absolute inset-0">
-            <div
-              className="absolute inset-0 opacity-20"
-              style={{
-                backgroundImage: 'radial-gradient(circle at 30% 50%, white 2px, transparent 2px)',
-                backgroundSize: '60px 60px',
-              }}
-            ></div>
-            <div className="absolute top-0 right-0 w-96 h-96 bg-[#32CD32] rounded-full filter blur-3xl opacity-20 animate-blob"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#1e7e34] rounded-full filter blur-3xl opacity-25 animate-blob animation-delay-2000"></div>
-          </div>
+        {/* CTA BANNER */}
+<section className="relative py-20 bg-green-600 overflow-hidden">
+  <div className="absolute inset-0">
+    <div className="absolute inset-0 opacity-20" style={{
+      backgroundImage: 'radial-gradient(circle at 30% 50%, white 2px, transparent 2px)',
+      backgroundSize: '60px 60px',
+    }}></div>
+    <div className="absolute top-0 right-0 w-96 h-96 bg-teal-400 rounded-full filter blur-3xl opacity-20 animate-blob"></div>
+    <div className="absolute bottom-0 left-0 w-96 h-96 bg-green-700 rounded-full filter blur-3xl opacity-25 animate-blob animation-delay-2000"></div>
+  </div>
 
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-            <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md px-5 py-2.5 rounded-full mb-8 border border-white/25 shadow-lg hover:bg-white/20 transition-all">
-              <ShoppingBagIcon sx={{ fontSize: 20 }} />
-              <span className="text-sm font-bold uppercase tracking-wide">Limited Time Offer</span>
-            </div>
+  <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+    <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md px-5 py-2.5 rounded-full mb-8 border border-white/25 shadow-lg hover:bg-white/20 transition-all">
+      <ShoppingBagIcon sx={{ fontSize: 20 }} />
+      <span className="text-sm font-bold uppercase tracking-wide">Limited Time Offer</span>
+    </div>
 
-            <h2 className="text-4xl sm:text-6xl font-black mb-6 leading-tight">
-              Get 20% OFF
-              <br />
-              <span className="text-lime-300">Your First Order!</span>
-            </h2>
+    <h2 className="text-4xl sm:text-6xl font-black mb-6 leading-tight">
+      Get 20% OFF
+      <br />
+      <span className="text-yellow-300">Your First Order!</span>
+    </h2>
 
-            <p className="text-xl sm:text-2xl text-green-100 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-              Sign up today and receive an exclusive discount on your first purchase. Limited time only!
-            </p>
+    <p className="text-xl sm:text-2xl text-green-100 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+      Sign up today and receive an exclusive discount on your first purchase. Limited time only!
+    </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link to="/register">
-                <button className="group px-10 py-5 bg-white text-[#228B22] font-black rounded-xl hover:bg-green-50 transition-all shadow-2xl hover:shadow-3xl hover:scale-105 text-lg flex items-center gap-3">
-                  <span>Sign Up Now</span>
-                  <ArrowForwardIcon className="group-hover:translate-x-1 transition-transform" />
-                </button>
-              </Link>
-              <button className="px-10 py-5 bg-white/10 backdrop-blur-md text-white font-bold rounded-xl border-2 border-white/30 hover:bg-white/20 transition-all shadow-xl text-lg">
-                Learn More
-              </button>
-            </div>
+    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      <Link to="/register">
+        <button className="group px-10 py-5 bg-white text-green-600 font-black rounded-xl hover:bg-green-50 transition-all shadow-2xl hover:shadow-3xl hover:scale-105 text-lg flex items-center gap-3">
+          <span>Sign Up Now</span>
+          <ArrowForwardIcon className="group-hover:translate-x-1 transition-transform" />
+        </button>
+      </Link>
+      <button className="px-10 py-5 bg-white/10 backdrop-blur-md text-white font-bold rounded-xl border-2 border-white/30 hover:bg-white/20 transition-all shadow-xl text-lg">
+        Learn More
+      </button>
+    </div>
 
-            <div className="mt-10 flex flex-wrap justify-center gap-8 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-lime-400 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-[#1a5f1a] font-bold text-xs">✓</span>
-                </div>
-                <span className="font-medium">No credit card required</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-lime-400 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-[#1a5f1a] font-bold text-xs">✓</span>
-                </div>
-                <span className="font-medium">Cancel anytime</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-lime-400 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-[#1a5f1a] font-bold text-xs">✓</span>
-                </div>
-                <span className="font-medium">Instant access</span>
-              </div>
-            </div>
-          </div>
-        </section>
+    <div className="mt-10 flex flex-wrap justify-center gap-8 text-sm">
+      <div className="flex items-center gap-2">
+        <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
+          <span className="text-green-800 font-bold text-xs">✓</span>
+        </div>
+        <span className="font-medium">No credit card required</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
+          <span className="text-green-800 font-bold text-xs">✓</span>
+        </div>
+        <span className="font-medium">Cancel anytime</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
+          <span className="text-green-800 font-bold text-xs">✓</span>
+        </div>
+        <span className="font-medium">Instant access</span>
+      </div>
+    </div>
+  </div>
+</section>
 
       </main>
 

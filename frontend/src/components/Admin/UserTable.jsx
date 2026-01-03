@@ -45,8 +45,16 @@ const UserTable = () => {
             renderCell: (params) => {
                 return (
                     <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 rounded-full">
-                            <img draggable="false" src={params.row.avatar} alt={params.row.name} className="w-full h-full rounded-full object-cover" />
+                        <div className="w-10 h-10 rounded-full bg-gray-200">
+                            <img 
+                                draggable="false" 
+                                src={params.row.avatar} 
+                                alt={params.row.name} 
+                                className="w-full h-full rounded-full object-cover"
+                                onError={(e) => {
+                                    e.target.src = 'https://via.placeholder.com/40?text=' + params.row.name.charAt(0);
+                                }}
+                            />
                         </div>
                         {params.row.name}
                     </div>
@@ -112,9 +120,9 @@ const UserTable = () => {
         rows.unshift({
             id: item._id,
             name: item.name,
-            avatar: item.avatar.url,
+            avatar: item.avatar?.url || 'https://via.placeholder.com/40?text=User',
             email: item.email,
-            gender: item.gender.toUpperCase(),
+            gender: item.gender?.toUpperCase() || 'N/A',
             role: item.role,
             registeredOn: new Date(item.createdAt).toISOString().substring(0, 10),
         });

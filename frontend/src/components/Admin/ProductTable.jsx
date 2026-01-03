@@ -53,8 +53,16 @@ const ProductTable = () => {
             renderCell: (params) => {
                 return (
                     <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 rounded-full">
-                            <img draggable="false" src={params.row.image} alt={params.row.name} className="w-full h-full rounded-full object-cover" />
+                        <div className="w-10 h-10 rounded-full bg-gray-200">
+                            <img 
+                                draggable="false" 
+                                src={params.row.image} 
+                                alt={params.row.name} 
+                                className="w-full h-full rounded-full object-cover"
+                                onError={(e) => {
+                                    e.target.src = 'https://via.placeholder.com/40?text=Product';
+                                }}
+                            />
                         </div>
                         {params.row.name}
                     </div>
@@ -150,7 +158,7 @@ const ProductTable = () => {
         rows.unshift({
             id: item._id,
             name: item.name,
-            image: item.images[0].url,
+            image: item.images?.[0]?.url || 'https://via.placeholder.com/40?text=No+Image',
             category: item.category,
             stock: item.stock,
             price: item.price,

@@ -28,16 +28,21 @@ const PrimaryDropDownMenu = ({ setTogglePrimaryDropDown, user }) => {
             onMouseEnter={() => setTogglePrimaryDropDown(true)}
             onMouseLeave={() => setTogglePrimaryDropDown(false)}
         >
-            {user.role === "admin" && (
-                <Link className="pl-3 py-3.5 border-b flex gap-3 items-center hover:bg-gray-50"
-                      to="/admin/dashboard">
+            {/* ✅ SAFE ADMIN CHECK */}
+            {user?.role === "admin" && (
+                <Link
+                    className="pl-3 py-3.5 border-b flex gap-3 items-center hover:bg-gray-50"
+                    to="/admin/dashboard"
+                >
                     <DashboardIcon sx={{ fontSize: 18 }} className="text-primary-blue" />
                     Admin Dashboard
                 </Link>
             )}
 
-            <Link className="pl-3 py-3.5 border-b flex gap-3 items-center hover:bg-gray-50"
-                  to={NAV_LINKS.ACCOUNT}>
+            <Link
+                className="pl-3 py-3.5 border-b flex gap-3 items-center hover:bg-gray-50"
+                to={NAV_LINKS.ACCOUNT}
+            >
                 <AccountCircleIcon sx={{ fontSize: 18 }} className="text-primary-blue" />
                 My Profile
             </Link>

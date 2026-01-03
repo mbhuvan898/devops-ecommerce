@@ -99,44 +99,53 @@ const MainData = () => {
         <>
             <MetaData title="Admin Dashboard | Best2Buy" />
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-6">
-                <div className="flex flex-col bg-purple-600 text-white gap-2 rounded-xl shadow-lg hover:shadow-xl p-6">
-                    <h4 className="text-gray-100 font-medium">Total Sales Amount</h4>
-                    <h2 className="text-2xl font-bold">₹{totalAmount?.toLocaleString()}</h2>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                <div className="flex flex-col bg-gradient-to-br from-purple-600 to-purple-700 text-white gap-2 rounded-xl shadow-lg hover:shadow-2xl transition-shadow p-6">
+                    <h4 className="text-purple-100 font-medium text-sm">Total Sales Amount</h4>
+                    <h2 className="text-3xl font-bold">₹{totalAmount?.toLocaleString()}</h2>
                 </div>
-                <div className="flex flex-col bg-red-500 text-white gap-2 rounded-xl shadow-lg hover:shadow-xl p-6">
-                    <h4 className="text-gray-100 font-medium">Total Orders</h4>
-                    <h2 className="text-2xl font-bold">{orders?.length}</h2>
+                <div className="flex flex-col bg-gradient-to-br from-red-500 to-red-600 text-white gap-2 rounded-xl shadow-lg hover:shadow-2xl transition-shadow p-6">
+                    <h4 className="text-red-100 font-medium text-sm">Total Orders</h4>
+                    <h2 className="text-3xl font-bold">{orders?.length}</h2>
                 </div>
-                <div className="flex flex-col bg-yellow-500 text-white gap-2 rounded-xl shadow-lg hover:shadow-xl p-6">
-                    <h4 className="text-gray-100 font-medium">Total Products</h4>
-                    <h2 className="text-2xl font-bold">{products?.length}</h2>
+                <div className="flex flex-col bg-gradient-to-br from-yellow-500 to-yellow-600 text-white gap-2 rounded-xl shadow-lg hover:shadow-2xl transition-shadow p-6">
+                    <h4 className="text-yellow-100 font-medium text-sm">Total Products</h4>
+                    <h2 className="text-3xl font-bold">{products?.length}</h2>
                 </div>
-                <div className="flex flex-col bg-green-500 text-white gap-2 rounded-xl shadow-lg hover:shadow-xl p-6">
-                    <h4 className="text-gray-100 font-medium">Total Users</h4>
-                    <h2 className="text-2xl font-bold">{users?.length}</h2>
+                <div className="flex flex-col bg-gradient-to-br from-green-500 to-green-600 text-white gap-2 rounded-xl shadow-lg hover:shadow-2xl transition-shadow p-6">
+                    <h4 className="text-green-100 font-medium text-sm">Total Users</h4>
+                    <h2 className="text-3xl font-bold">{users?.length}</h2>
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-8 min-w-full">
-                <div className="bg-white rounded-xl h-auto w-full shadow-lg p-2">
+            {/* Charts Row 1 */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+                <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Sales Overview</h3>
                     <Line data={lineState} />
                 </div>
 
-                <div className="bg-white rounded-xl shadow-lg p-4 text-center">
-                    <span className="font-medium uppercase text-gray-800">Order Status</span>
-                    <Pie data={pieState} />
+                <div className="bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Order Status</h3>
+                    <div className="flex items-center justify-center">
+                        <Pie data={pieState} />
+                    </div>
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-8 min-w-full mb-6">
-                <div className="bg-white rounded-xl h-auto w-full shadow-lg p-2">
+            {/* Charts Row 2 */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full mb-6">
+                <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Products by Category</h3>
                     <Bar data={barState} />
                 </div>
 
-                <div className="bg-white rounded-xl shadow-lg p-4 text-center">
-                    <span className="font-medium uppercase text-gray-800">Stock Status</span>
-                    <Doughnut data={doughnutState} />
+                <div className="bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Stock Status</h3>
+                    <div className="flex items-center justify-center">
+                        <Doughnut data={doughnutState} />
+                    </div>
                 </div>
             </div>
         </>

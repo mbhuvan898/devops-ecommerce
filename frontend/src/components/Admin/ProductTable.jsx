@@ -165,22 +165,38 @@ const ProductTable = () => {
 
             {loading && <BackdropLoader />}
 
-            <div className="flex justify-between items-center">
-                <h1 className="text-lg font-medium uppercase">products</h1>
-                <Link to="/admin/new_product" className="py-2 px-4 rounded shadow font-medium text-white bg-primary-blue hover:shadow-lg">New Product</Link>
-            </div>
-            <div className="bg-white rounded-xl shadow-lg w-full" style={{ height: 470 }}>
+            <div className="w-full">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+                        <p className="text-sm text-gray-500 mt-1">Manage your product inventory</p>
+                    </div>
+                    <Link 
+                        to="/admin/new_product" 
+                        className="py-2.5 px-6 rounded-lg shadow-md font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all"
+                    >
+                        + New Product
+                    </Link>
+                </div>
 
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    pageSize={10}
-                    disableSelectIconOnClick
-                    sx={{
-                        boxShadow: 0,
-                        border: 0,
-                    }}
-                />
+                <div className="bg-white rounded-xl shadow-lg w-full overflow-hidden" style={{ height: 600 }}>
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        pageSize={10}
+                        disableSelectIconOnClick
+                        sx={{
+                            boxShadow: 0,
+                            border: 0,
+                            '& .MuiDataGrid-cell:focus': {
+                                outline: 'none',
+                            },
+                            '& .MuiDataGrid-row:hover': {
+                                backgroundColor: '#f9fafb',
+                            },
+                        }}
+                    />
+                </div>
             </div>
         </>
     );

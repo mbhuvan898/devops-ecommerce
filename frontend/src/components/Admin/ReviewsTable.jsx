@@ -102,22 +102,56 @@ const ReviewsTable = () => {
             <MetaData title="Admin Reviews | Best2Buy" />
 
             {loading && <BackdropLoader />}
-            <div className="flex justify-between items-center gap-2 sm:gap-12">
-                <h1 className="text-lg font-medium uppercase">reviews</h1>
-                <input type="text" placeholder="Product ID" value={productId} onChange={(e) => setProductId(e.target.value)} className="outline-none border-0 rounded p-2 w-full shadow hover:shadow-lg" />
-            </div>
-            <div className="bg-white rounded-xl shadow-lg w-full" style={{ height: 450 }}>
+            
+            <div className="w-full">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900">Reviews</h1>
+                        <p className="text-sm text-gray-500 mt-1">Manage product reviews</p>
+                    </div>
+                    <input 
+                        type="text" 
+                        placeholder="Enter Product ID (24 characters)" 
+                        value={productId} 
+                        onChange={(e) => setProductId(e.target.value)} 
+                        className="outline-none border border-gray-300 rounded-lg p-3 w-full sm:w-80 shadow-sm hover:shadow-md focus:border-blue-500 transition-all text-sm" 
+                    />
+                </div>
 
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    pageSize={10}
-                    disableSelectIconOnClick
-                    sx={{
-                        boxShadow: 0,
-                        border: 0,
-                    }}
-                />
+                {productId.length === 24 ? (
+                    <div className="bg-white rounded-xl shadow-lg w-full overflow-hidden" style={{ height: 550 }}>
+                        <DataGrid
+                            rows={rows}
+                            columns={columns}
+                            pageSize={10}
+                            disableSelectIconOnClick
+                            sx={{
+                                boxShadow: 0,
+                                border: 0,
+                                '& .MuiDataGrid-cell:focus': {
+                                    outline: 'none',
+                                },
+                                '& .MuiDataGrid-row:hover': {
+                                    backgroundColor: '#f9fafb',
+                                },
+                            }}
+                        />
+                    </div>
+                ) : (
+                    <div className="bg-white rounded-xl shadow-lg p-12 text-center">
+                        <div className="flex flex-col items-center gap-4">
+                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Enter Product ID</h3>
+                                <p className="text-sm text-gray-500">Please enter a valid 24-character Product ID to view its reviews</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </>
     );

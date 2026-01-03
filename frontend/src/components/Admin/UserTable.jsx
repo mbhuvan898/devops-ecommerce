@@ -126,19 +126,30 @@ const UserTable = () => {
 
             {loading && <BackdropLoader />}
 
-            <h1 className="text-lg font-medium uppercase">users</h1>
-            <div className="bg-white rounded-xl shadow-lg w-full" style={{ height: 470 }}>
+            <div className="w-full">
+                <div className="mb-6">
+                    <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+                    <p className="text-sm text-gray-500 mt-1">Manage all registered users</p>
+                </div>
 
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    pageSize={10}
-                    disableSelectIconOnClick
-                    sx={{
-                        boxShadow: 0,
-                        border: 0,
-                    }}
-                />
+                <div className="bg-white rounded-xl shadow-lg w-full overflow-hidden" style={{ height: 600 }}>
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        pageSize={10}
+                        disableSelectIconOnClick
+                        sx={{
+                            boxShadow: 0,
+                            border: 0,
+                            '& .MuiDataGrid-cell:focus': {
+                                outline: 'none',
+                            },
+                            '& .MuiDataGrid-row:hover': {
+                                backgroundColor: '#f9fafb',
+                            },
+                        }}
+                    />
+                </div>
             </div>
         </>
     );

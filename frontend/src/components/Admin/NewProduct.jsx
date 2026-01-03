@@ -9,10 +9,77 @@ import { useNavigate } from "react-router-dom";
 
 import { createProduct, clearErrors } from "../../actions/productAction";
 import { NEW_PRODUCT_RESET } from "../../constants/productConstants";
-import { categories } from "../../utils/constants";
 
 import MetaData from "../Layouts/MetaData";
 import BackdropLoader from "../Layouts/BackdropLoader";
+
+// CATEGORIES DATA - Matching MinCategory.jsx structure
+const detailedCategories = [
+  {
+    name: "Mobiles",
+    subcategories: [
+      { name: "Smartphones", types: ["Android", "iPhone"] },
+      { name: "Accessories", types: ["Chargers", "Cables", "Cases"] },
+    ],
+  },
+  {
+    name: "Fashion",
+    subcategories: [
+      { name: "Men", types: ["Shirts", "T-Shirts", "Jeans", "Trousers", "Shoes", "Watches"] },
+      { name: "Women", types: ["Sarees", "Kurtis", "Tops", "Dresses", "Jewellery", "Heels"] },
+      { name: "Kids", types: ["Clothing", "Toys", "Footwear", "Baby Care"] },
+    ],
+  },
+  {
+    name: "Electronics",
+    subcategories: [
+      { name: "Laptops", types: ["Gaming", "Business", "2-in-1"] },
+      { name: "Cameras", types: ["DSLR", "Mirrorless", "Action Cameras"] },
+      { name: "Audio", types: ["Headphones", "Speakers", "Soundbars"] },
+    ],
+  },
+  {
+    name: "Home",
+    subcategories: [
+      { name: "Kitchen", types: ["Cookware", "Appliances", "Dining", "Storage"] },
+      { name: "Decor", types: ["Lighting", "Wall Art", "Rugs", "Cushions"] },
+    ],
+  },
+  {
+    name: "Appliances",
+    subcategories: [
+      { name: "Televisions", types: ["Smart TVs", "LED TVs", "Android TVs"] },
+      { name: "Washing Machines", types: ["Front Load", "Top Load"] },
+      { name: "Refrigerators", types: ["Single Door", "Double Door"] },
+      { name: "Kitchen Appliances", types: ["Microwaves", "Mixers", "Induction Cooktops"] },
+    ],
+  },
+  {
+    name: "Furniture",
+    subcategories: [
+      { name: "Living Room", types: ["Sofas", "TV Units", "Center Tables", "Recliners"] },
+      { name: "Bedroom", types: ["Beds", "Wardrobes", "Mattresses", "Side Tables"] },
+      { name: "Office", types: ["Chairs", "Desks", "Bookshelves"] },
+      { name: "Outdoor", types: ["Patio Sets", "Garden Chairs", "Swings"] },
+    ],
+  },
+  {
+    name: "Beauty,Toys & more",
+    subcategories: [
+      { name: "Beauty & Grooming", types: ["Makeup", "Perfumes", "Hair Dryers", "Trimmers"] },
+      { name: "Toys & Games", types: ["Soft Toys", "Action Figures", "Puzzles", "Board Games"] },
+      { name: "Sports & Fitness", types: ["Cricket", "Cycling", "Yoga Mats", "Fitness Bands"] },
+    ],
+  },
+  {
+    name: "Grocery",
+    subcategories: [
+      { name: "Fruits & Vegetables", types: ["Fresh Fruits", "Leafy Greens"] },
+      { name: "Snacks & Beverages", types: ["Chips", "Soft Drinks", "Biscuits"] },
+      { name: "Essentials", types: ["Detergents", "Cleaners", "Toiletries"] },
+    ],
+  },
+];
 
 const NewProduct = () => {
   const dispatch = useDispatch();
@@ -50,6 +117,38 @@ const NewProduct = () => {
   // ---------------- IMAGES (FILES) ----------------
   const [images, setImages] = useState([]);
   const [imagesPreview, setImagesPreview] = useState([]);
+
+  // ---------------- DEPENDENT DROPDOWNS ----------------
+  const [availableSubcategories, setAvailableSubcategories] = useState([]);
+  const [availableProductTypes, setAvailableProductTypes] = useState([]);
+
+  // Update subcategories when category changes
+  useEffect(() => {
+    if (category) {
+      const selectedCat = detailedCategories.find(cat => cat.name === category);
+      setAvailableSubcategories(selectedCat ? selectedCat.subcategories : []);
+      setSubcategory(""); // Reset subcategory
+      setProductType(""); // Reset product type
+      setAvailableProductTypes([]);
+    } else {
+      setAvailableSubcategories([]);
+      setAvailableProductTypes([]);
+    }
+  }, [category]);
+
+  // Update product types when subcategory changes
+  useEffect(() => {
+    if (subcategory && category) {
+      const selectedCat = detailedCategories.find(cat => cat.name === category);
+      if (selectedCat) {
+        const selectedSub = selectedCat.subcategories.find(sub => sub.name === subcategory);
+        setAvailableProductTypes(selectedSub ? selectedSub.types : []);
+        setProductType(""); // Reset product type
+      }
+    } else {
+      setAvailableProductTypes([]);
+    }
+  }, [subcategory, category]);
 
   // =====================================================
   // IMAGE HANDLER (FILES ONLY)
@@ -195,7 +294,8 @@ const NewProduct = () => {
               fullWidth 
               size="small"
               value={name} 
-              onChange={(e) => setName(e.target.value)} 
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Redmi Note 13 Pro+ 5G"
             />
             
             <TextField 
@@ -206,7 +306,8 @@ const NewProduct = () => {
               fullWidth 
               size="small"
               value={description} 
-              onChange={(e) => setDescription(e.target.value)} 
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Detailed product description..."
             />
 
             <div className="grid grid-cols-2 gap-3">
@@ -232,6 +333,7 @@ const NewProduct = () => {
               />
             </div>
 
+            {/* CATEGORY DROPDOWN */}
             <TextField 
               label="Category" 
               select 
@@ -241,27 +343,49 @@ const NewProduct = () => {
               value={category} 
               onChange={(e) => setCategory(e.target.value)}
             >
-              {categories.map((c) => (
-                <MenuItem key={c} value={c}>{c}</MenuItem>
+              <MenuItem value="">
+                <em>Select Category</em>
+              </MenuItem>
+              {detailedCategories.map((cat) => (
+                <MenuItem key={cat.name} value={cat.name}>{cat.name}</MenuItem>
               ))}
             </TextField>
 
-            <div className="grid grid-cols-2 gap-3">
-              <TextField 
-                label="Subcategory" 
-                fullWidth 
-                size="small"
-                value={subcategory} 
-                onChange={(e) => setSubcategory(e.target.value)} 
-              />
-              <TextField 
-                label="Product Type" 
-                fullWidth 
-                size="small"
-                value={productType} 
-                onChange={(e) => setProductType(e.target.value)} 
-              />
-            </div>
+            {/* SUBCATEGORY DROPDOWN - Depends on Category */}
+            <TextField 
+              label="Subcategory" 
+              select
+              fullWidth 
+              size="small"
+              value={subcategory} 
+              onChange={(e) => setSubcategory(e.target.value)}
+              disabled={!category}
+            >
+              <MenuItem value="">
+                <em>{category ? "Select Subcategory" : "Select Category First"}</em>
+              </MenuItem>
+              {availableSubcategories.map((sub) => (
+                <MenuItem key={sub.name} value={sub.name}>{sub.name}</MenuItem>
+              ))}
+            </TextField>
+
+            {/* PRODUCT TYPE DROPDOWN - Depends on Subcategory */}
+            <TextField 
+              label="Product Type" 
+              select
+              fullWidth 
+              size="small"
+              value={productType} 
+              onChange={(e) => setProductType(e.target.value)}
+              disabled={!subcategory}
+            >
+              <MenuItem value="">
+                <em>{subcategory ? "Select Product Type" : "Select Subcategory First"}</em>
+              </MenuItem>
+              {availableProductTypes.map((type) => (
+                <MenuItem key={type} value={type}>{type}</MenuItem>
+              ))}
+            </TextField>
 
             <div className="grid grid-cols-2 gap-3">
               <TextField 

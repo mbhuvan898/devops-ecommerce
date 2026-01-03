@@ -17,6 +17,7 @@ const OrderTable = () => {
     const [showStatusModal, setShowStatusModal] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [newStatus, setNewStatus] = useState('');
+    const [statusFilter, setStatusFilter] = useState('All'); // New filter state
     const itemsPerPage = 10;
 
     const { orders, error } = useSelector((state) => state.allOrders);
@@ -43,6 +44,11 @@ const OrderTable = () => {
         }
         dispatch(getAllOrders());
     }, [dispatch, error, deleteError, isDeleted, isUpdated, enqueueSnackbar]);
+
+    // Reset to page 1 when filter changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [statusFilter, searchTerm]);
 
     const deleteOrderHandler = (id) => {
         if (window.confirm('Are you sure you want to delete this order?')) {
@@ -82,10 +88,12 @@ const OrderTable = () => {
     const filteredAndSortedOrders = useMemo(() => {
         if (!orders) return [];
         
-        let filtered = orders.filter(order =>
-            order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.orderStatus.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        let filtered = orders.filter(order => {
+            const matchesSearch = order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                order.orderStatus.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesStatus = statusFilter === 'All' || order.orderStatus === statusFilter;
+            return matchesSearch && matchesStatus;
+        });
 
         if (sortConfig.key) {
             filtered.sort((a, b) => {
@@ -110,10 +118,11 @@ const OrderTable = () => {
         }
 
         return filtered;
-    }, [orders, searchTerm, sortConfig]);
+    }, [orders, searchTerm, sortConfig, statusFilter]);
 
     const totalOrders = orders ? orders.length : 0;
-    const latestOrders = orders ? orders.slice(0, 5).length : 0;
+    const processingOrders = orders ? orders.filter(order => order.orderStatus === 'Processing').length : 0;
+    const shippedOrders = orders ? orders.filter(order => order.orderStatus === 'Shipped').length : 0;
     const deliveredOrders = orders ? orders.filter(order => order.orderStatus === 'Delivered').length : 0;
 
     const totalPages = Math.ceil(filteredAndSortedOrders.length / itemsPerPage);
@@ -150,9 +159,12 @@ const OrderTable = () => {
                     </div>
                 </div>
 
-                {/* Stats Cards - Matching MainData colors */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="flex flex-col bg-gradient-to-br from-red-500 to-red-600 text-white gap-2 rounded-xl shadow-lg hover:shadow-2xl transition-shadow p-6">
+                {/* Stats Cards - Clickable filters */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div 
+                        onClick={() => setStatusFilter('All')}
+                        className={`flex flex-col bg-gradient-to-br from-red-500 to-red-600 text-white gap-2 rounded-xl shadow-lg hover:shadow-2xl transition-all p-6 cursor-pointer ${statusFilter === 'All' ? 'ring-4 ring-red-300' : ''}`}
+                    >
                         <div className="flex items-center justify-between">
                             <div>
                                 <h4 className="text-red-100 font-medium text-sm">Total Orders</h4>
@@ -164,30 +176,69 @@ const OrderTable = () => {
                         </div>
                     </div>
 
-                    <div className="flex flex-col bg-gradient-to-br from-yellow-500 to-yellow-600 text-white gap-2 rounded-xl shadow-lg hover:shadow-2xl transition-shadow p-6">
+                    <div 
+                        onClick={() => setStatusFilter('Processing')}
+                        className={`flex flex-col bg-gradient-to-br from-blue-500 to-blue-600 text-white gap-2 rounded-xl shadow-lg hover:shadow-2xl transition-all p-6 cursor-pointer ${statusFilter === 'Processing' ? 'ring-4 ring-blue-300' : ''}`}
+                    >
                         <div className="flex items-center justify-between">
                             <div>
-                                <h4 className="text-yellow-100 font-medium text-sm">Latest Orders</h4>
-                                <h2 className="text-3xl font-bold mt-1">{latestOrders}</h2>
+                                <h4 className="text-blue-100 font-medium text-sm">Processing</h4>
+                                <h2 className="text-3xl font-bold mt-1">{processingOrders}</h2>
                             </div>
                             <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                                <span className="text-2xl">🆕</span>
+                                <span className="text-2xl">⏳</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex flex-col bg-gradient-to-br from-green-500 to-green-600 text-white gap-2 rounded-xl shadow-lg hover:shadow-2xl transition-shadow p-6">
+                    <div 
+                        onClick={() => setStatusFilter('Shipped')}
+                        className={`flex flex-col bg-gradient-to-br from-yellow-500 to-yellow-600 text-white gap-2 rounded-xl shadow-lg hover:shadow-2xl transition-all p-6 cursor-pointer ${statusFilter === 'Shipped' ? 'ring-4 ring-yellow-300' : ''}`}
+                    >
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h4 className="text-yellow-100 font-medium text-sm">Shipped</h4>
+                                <h2 className="text-3xl font-bold mt-1">{shippedOrders}</h2>
+                            </div>
+                            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                <span className="text-2xl">🚚</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div 
+                        onClick={() => setStatusFilter('Delivered')}
+                        className={`flex flex-col bg-gradient-to-br from-green-500 to-green-600 text-white gap-2 rounded-xl shadow-lg hover:shadow-2xl transition-all p-6 cursor-pointer ${statusFilter === 'Delivered' ? 'ring-4 ring-green-300' : ''}`}
+                    >
                         <div className="flex items-center justify-between">
                             <div>
                                 <h4 className="text-green-100 font-medium text-sm">Delivered</h4>
                                 <h2 className="text-3xl font-bold mt-1">{deliveredOrders}</h2>
                             </div>
                             <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                                <span className="text-2xl">✓</span>
+                                <span className="text-2xl">✅</span>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                {/* Active Filter Indicator */}
+                {statusFilter !== 'All' && (
+                    <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <span className="text-blue-700 font-medium">
+                                Showing: {statusFilter} Orders ({filteredAndSortedOrders.length})
+                            </span>
+                        </div>
+                        <button 
+                            onClick={() => setStatusFilter('All')}
+                            className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-1"
+                        >
+                            <X className="w-4 h-4" />
+                            Clear Filter
+                        </button>
+                    </div>
+                )}
 
                 {/* Search Bar */}
                 <div className="bg-white rounded-xl shadow-md p-4">

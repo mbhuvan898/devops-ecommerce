@@ -24,9 +24,9 @@ import {
     UPDATE_ORDER_SUCCESS,
 } from "../constants/orderConstants";
 
-// Correct backend base route
-const API_BASE = "/api/v1";
-
+// ✅ Runtime-safe API base (NO hardcoded URL, NO injection)
+const API_BASE =
+    window.__ENV__?.API_URL || "/api/v1";
 
 // -------------------------------------------------
 // Create new order
@@ -57,7 +57,6 @@ export const newOrder = (order) => async (dispatch) => {
     }
 };
 
-
 // -------------------------------------------------
 // Get logged-in user's orders
 // -------------------------------------------------
@@ -82,7 +81,6 @@ export const myOrders = () => async (dispatch) => {
         });
     }
 };
-
 
 // -------------------------------------------------
 // Get single order details
@@ -109,7 +107,6 @@ export const getOrderDetails = (id) => async (dispatch) => {
     }
 };
 
-
 // -------------------------------------------------
 // Get payment status
 // -------------------------------------------------
@@ -135,7 +132,6 @@ export const getPaymentStatus = (id) => async (dispatch) => {
     }
 };
 
-
 // -------------------------------------------------
 // ADMIN: Get all orders
 // -------------------------------------------------
@@ -160,7 +156,6 @@ export const getAllOrders = () => async (dispatch) => {
         });
     }
 };
-
 
 // -------------------------------------------------
 // ADMIN: Update order
@@ -191,7 +186,6 @@ export const updateOrder = (id, orderData) => async (dispatch) => {
     }
 };
 
-
 // -------------------------------------------------
 // ADMIN: Delete order
 // -------------------------------------------------
@@ -217,8 +211,9 @@ export const deleteOrder = (id) => async (dispatch) => {
     }
 };
 
-
+// -------------------------------------------------
+// Clear errors
+// -------------------------------------------------
 export const clearErrors = () => async (dispatch) => {
     dispatch({ type: CLEAR_ERRORS });
 };
-

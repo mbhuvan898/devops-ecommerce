@@ -1,11 +1,18 @@
 import axios from "axios";
-import { ADD_TO_WISHLIST, REMOVE_FROM_WISHLIST } from "../constants/wishlistConstants";
+import {
+    ADD_TO_WISHLIST,
+    REMOVE_FROM_WISHLIST,
+} from "../constants/wishlistConstants";
 
-const API_BASE = "/api/v1"; 
+// ✅ Runtime-safe API base
+const API_BASE =
+    window.__ENV__?.API_URL || "/api/v1";
 
-// Add To Wishlist
+// Add to wishlist
 export const addToWishlist = (id) => async (dispatch, getState) => {
-    const { data } = await axios.get(`${API_BASE}/api/v1/product/${id}`);
+    const { data } = await axios.get(
+        `${API_BASE}/product/${id}`
+    );
 
     dispatch({
         type: ADD_TO_WISHLIST,
@@ -26,7 +33,7 @@ export const addToWishlist = (id) => async (dispatch, getState) => {
     );
 };
 
-// Remove From Wishlist
+// Remove from wishlist
 export const removeFromWishlist = (id) => async (dispatch, getState) => {
     dispatch({
         type: REMOVE_FROM_WISHLIST,

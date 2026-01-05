@@ -8,10 +8,22 @@ const ErrorHandler = require("../utils/errorHandler");
 // =====================================================
 // 💳 Initialize Razorpay Instance
 // =====================================================
-const razorpayInstance = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_SECRET, // must match .env variable name
-});
+let razorpayInstance;
+
+function getRazorpayInstance() {
+  if (!razorpayInstance) {
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_SECRET) {
+      throw new Error("Razorpay credentials not configured");
+    }
+
+    razorpayInstance = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_SECRET,
+    });
+  }
+
+  return razorpayInstance;
+}
 
 // =====================================================
 // 1️⃣ Create Razorpay Order (Card / UPI / Wallet supported)

@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: ecommerce
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+        - name: order-service
+          image: REGISTRY.azurecr.io/order-service:v1
+          ports:
+            - containerPort: 4003
+          env:
+            - name: PORT
+              value: "4003"
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef: { name: ecommerce-secrets, key: MONGO_URI_ORDERS }
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef: { name: ecommerce-secrets, key: JWT_SECRET }
+            - name: SENDGRID_API_KEY
+              valueFrom:
+                secretKeyRef: { name: ecommerce-secrets, key: SENDGRID_API_KEY }
+            - name: SENDGRID_MAIL
+              valueFrom:
+                secretKeyRef: { name: ecommerce-secrets, key: SENDGRID_MAIL }
+            - name: SENDGRID_ORDER_TEMPLATEID
+              valueFrom:
+                secretKeyRef: { name: ecommerce-secrets, key: SENDGRID_ORDER_TEMPLATEID }
+          envFrom:
+            - configMapRef:
+                name: ecommerce-config
+          readinessProbe:
+            httpGet: { path: /health, port: 4003 }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /health, port: 4003 }
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { cpu: 500m, memory: 512Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: ecommerce
+spec:
+  selector:
+    app: order-service
+  ports:
+    - port: 4003
+      targetPort: 4003

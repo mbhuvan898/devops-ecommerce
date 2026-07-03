@@ -1,28 +1,109 @@
-version: "3.9"
+# =====================================================================
+# Local development stack — 4 microservices + frontend/gateway + MongoDB
+#
+#   docker compose up --build
+#   → app on http://localhost:8080
+#
+# Secrets: copy .env.example to .env in the repo root; docker compose
+# substitutes ${VARS} below from it. Everything has a dev default so
+# the stack boots even with an empty .env (emails/payments/S3 disabled).
+#
+# One Mongo CONTAINER, four DATABASES (users/products/orders/payments).
+# Each service only knows its own MONGO_URI — swapping one service to
+# its own cluster later means changing one env var.
+# =====================================================================
 
 services:
-  backend:
-    build:
-      context: ./backend
-    container_name: backend
-    ports:
-      - "4000:4000"
-    env_file:
-      - ./backend/.env
+  mongo:
+    image: mongo:7
+    container_name: mongo
     volumes:
-      - ./backend:/app
-      - /app/node_modules
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  user-service:
+    build: ./services/user-service
+    container_name: user-service
+    environment:
+      PORT: 4001
+      MONGO_URI: mongodb://mongo:27017/users
+      JWT_SECRET: ${JWT_SECRET:-dev-only-secret-change-me}
+      JWT_EXPIRE: ${JWT_EXPIRE:-7d}
+      COOKIE_EXPIRE: ${COOKIE_EXPIRE:-5}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+      ORDER_SERVICE_URL: http://order-service:4003
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY:-}
+      SENDGRID_MAIL: ${SENDGRID_MAIL:-}
+      SENDGRID_RESET_TEMPLATEID: ${SENDGRID_RESET_TEMPLATEID:-}
+      SENDGRID_ORDER_TEMPLATEID: ${SENDGRID_ORDER_TEMPLATEID:-}
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  product-service:
+    build: ./services/product-service
+    container_name: product-service
+    environment:
+      PORT: 4002
+      MONGO_URI: mongodb://mongo:27017/products
+      JWT_SECRET: ${JWT_SECRET:-dev-only-secret-change-me}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+      AWS_REGION: ${AWS_REGION:-ap-south-2}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  order-service:
+    build: ./services/order-service
+    container_name: order-service
+    environment:
+      PORT: 4003
+      MONGO_URI: mongodb://mongo:27017/orders
+      JWT_SECRET: ${JWT_SECRET:-dev-only-secret-change-me}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+      PRODUCT_SERVICE_URL: http://product-service:4002
+      USER_SERVICE_URL: http://user-service:4001
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY:-}
+      SENDGRID_MAIL: ${SENDGRID_MAIL:-}
+      SENDGRID_ORDER_TEMPLATEID: ${SENDGRID_ORDER_TEMPLATEID:-}
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  payment-service:
+    build: ./services/payment-service
+    container_name: payment-service
+    environment:
+      PORT: 4004
+      MONGO_URI: mongodb://mongo:27017/payments
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
+      RAZORPAY_SECRET: ${RAZORPAY_SECRET:-}
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # React build served by nginx, which ALSO acts as the API gateway —
+  # see frontend/nginx.conf for the path → service routing table.
   frontend:
-    build:
-      context: ./frontend
+    build: ./frontend
     container_name: frontend
     ports:
-      - "3000:3000"
+      - "8080:80"
     environment:
-      - CHOKIDAR_USEPOLLING=true
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      API_URL: /api/v1
     depends_on:
-      - backend
+      - user-service
+      - product-service
+      - order-service
+      - payment-service
+
+volumes:
+  mongo-data:

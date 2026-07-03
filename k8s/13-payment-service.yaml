@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: ecommerce
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      containers:
+        - name: payment-service
+          image: REGISTRY.azurecr.io/payment-service:v1
+          ports:
+            - containerPort: 4004
+          env:
+            - name: PORT
+              value: "4004"
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef: { name: ecommerce-secrets, key: MONGO_URI_PAYMENTS }
+            - name: RAZORPAY_KEY_ID
+              valueFrom:
+                secretKeyRef: { name: ecommerce-secrets, key: RAZORPAY_KEY_ID }
+            - name: RAZORPAY_SECRET
+              valueFrom:
+                secretKeyRef: { name: ecommerce-secrets, key: RAZORPAY_SECRET }
+          envFrom:
+            - configMapRef:
+                name: ecommerce-config
+          readinessProbe:
+            httpGet: { path: /health, port: 4004 }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /health, port: 4004 }
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { cpu: 500m, memory: 512Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: ecommerce
+spec:
+  selector:
+    app: payment-service
+  ports:
+    - port: 4004
+      targetPort: 4004

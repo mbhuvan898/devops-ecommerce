@@ -4,3 +4,13 @@ frontend/node_modules/
 .env
 */.env
 **/.env
+
+# Terraform — state files contain secrets, never commit them
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/terraform.tfvars
+terraform/.terraform.lock.hcl
+
+# Kubernetes — real secrets stay local; only the .example is committed
+k8s/02-secrets.yaml

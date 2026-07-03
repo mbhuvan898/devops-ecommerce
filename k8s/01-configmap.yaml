@@ -1,0 +1,18 @@
+# ConfigMap = non-secret configuration, injected into pods as env vars.
+# Service URLs use Kubernetes DNS: <service-name>.<namespace>.svc — within
+# the same namespace, just the service name works (http://order-service:4003).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ecommerce-config
+  namespace: ecommerce
+data:
+  NODE_ENV: "production"
+  # Public URL of the app (the frontend LoadBalancer IP or your domain)
+  FRONTEND_URL: "http://REPLACE_WITH_PUBLIC_IP_OR_DOMAIN"
+  ORDER_SERVICE_URL: "http://order-service:4003"
+  PRODUCT_SERVICE_URL: "http://product-service:4002"
+  USER_SERVICE_URL: "http://user-service:4001"
+  JWT_EXPIRE: "7d"
+  COOKIE_EXPIRE: "5"
+  AWS_REGION: "ap-south-2"

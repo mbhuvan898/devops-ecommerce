@@ -1,0 +1,8 @@
+# Copy to terraform.tfvars and adjust.
+# prefix must be globally unique-ish: it becomes part of the ACR and
+# Cosmos DB names. Letters and numbers only.
+
+prefix         = "b2becom123"
+location       = "centralindia"
+aks_node_count = 2
+aks_node_size  = "Standard_B2s"

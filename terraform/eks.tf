@@ -69,6 +69,12 @@ resource "aws_eks_cluster" "main" {
     endpoint_private_access  = true
   }
 
+  # API mode enables EKS access entries (github_oidc.tf) instead of the
+  # older aws-auth ConfigMap for granting cluster access to IAM identities.
+  access_config {
+    authentication_mode = "API"
+  }
+
   depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
   tags       = var.tags
 }

@@ -24,3 +24,8 @@ output "docdb_endpoint" {
 output "aws_region" {
   value = var.aws_region
 }
+
+output "github_actions_role_arn" {
+  description = "Paste into the GitHub repo secret AWS_ROLE_ARN — the workflow assumes this via OIDC, no static keys needed."
+  value       = aws_iam_role.github_actions.arn
+}

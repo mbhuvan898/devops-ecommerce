@@ -61,6 +61,12 @@ variable "docdb_master_password" {
   sensitive   = true
 }
 
+variable "github_repo" {
+  description = "GitHub \"owner/repo\" allowed to assume the CI IAM role via OIDC."
+  type        = string
+  default     = "mbhuvan898/devops-ecommerce"
+}
+
 variable "tags" {
   description = "Tags applied to every resource — useful for cost tracking."
   type        = map(string)

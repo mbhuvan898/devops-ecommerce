@@ -1,0 +1,147 @@
+# CI/CD: test -> SonarQube (code quality) -> build image -> Trivy (image
+# vulnerability scan) -> push to ECR -> deploy to EKS.
+#
+# Auth to AWS uses GitHub OIDC (see terraform/github_oidc.tf) — no
+# AWS_ACCESS_KEY_ID/SECRET stored in this repo. Required repo secrets:
+#   AWS_ROLE_ARN   - terraform output github_actions_role_arn
+#   SONAR_TOKEN    - SonarCloud project token
+#
+# These env vars must match terraform.tfvars if you change the defaults.
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "services/**"
+      - "frontend/**"
+      - "k8s/**"
+      - ".github/workflows/ci-cd.yml"
+  workflow_dispatch: {}
+
+env:
+  AWS_REGION: ap-south-1
+  PREFIX: b2becom
+  EKS_CLUSTER_NAME: b2becom-eks
+  NAMESPACE: ecommerce
+
+jobs:
+  # ── Unit tests + static code analysis, one run per backend service ──
+  test-and-sonar:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [user-service, product-service, order-service, payment-service]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # SonarQube wants full history for blame/new-code analysis
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: services/${{ matrix.service }}/package-lock.json
+
+      - name: Install dependencies
+        working-directory: services/${{ matrix.service }}
+        run: npm ci
+
+      - name: Run tests
+        working-directory: services/${{ matrix.service }}
+        run: npm test --if-present
+
+      - name: SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        with:
+          projectBaseDir: services/${{ matrix.service }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  # ── Build, scan, and push a container image per service (+ frontend) ──
+  build-scan-push:
+    needs: test-and-sonar
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # required to mint the OIDC token for AWS
+      contents: read
+      security-events: write # required to upload the Trivy SARIF report
+    strategy:
+      matrix:
+        service: [user-service, product-service, order-service, payment-service, frontend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC, no stored keys)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build image
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          REPO: ${{ env.PREFIX }}/${{ matrix.service }}
+          TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$REPO:$TAG -t $REGISTRY/$REPO:latest ${{ matrix.service == 'frontend' && 'frontend' || format('services/{0}', matrix.service) }}
+
+      - name: Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: "${{ steps.ecr-login.outputs.registry }}/${{ env.PREFIX }}/${{ matrix.service }}:${{ github.sha }}"
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          # Report-only for now — flip to '1' once the images are clean,
+          # so a CRITICAL/HIGH finding actually blocks the deploy.
+          exit-code: "0"
+
+      - name: Upload Trivy results to the Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-${{ matrix.service }}
+
+      - name: Push image
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          REPO: ${{ env.PREFIX }}/${{ matrix.service }}
+          TAG: ${{ github.sha }}
+        run: |
+          docker push $REGISTRY/$REPO:$TAG
+          docker push $REGISTRY/$REPO:latest
+
+  # ── Roll the new images out to the EKS cluster ──
+  deploy:
+    needs: build-scan-push
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Configure AWS credentials (OIDC, no stored keys)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+
+      - name: Roll out new images
+        run: |
+          REGISTRY=$(aws sts get-caller-identity --query Account --output text).dkr.ecr.$AWS_REGION.amazonaws.com
+          for svc in user-service product-service order-service payment-service frontend; do
+            kubectl set image deployment/$svc $svc=$REGISTRY/$PREFIX/$svc:${{ github.sha }} -n $NAMESPACE
+          done
+
+      - name: Wait for rollout
+        run: |
+          for svc in user-service product-service order-service payment-service frontend; do
+            kubectl rollout status deployment/$svc -n $NAMESPACE --timeout=180s
+          done

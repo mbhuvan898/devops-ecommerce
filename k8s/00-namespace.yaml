@@ -1,0 +1,6 @@
+# A namespace groups all the app's resources so they can be listed,
+# secured and deleted as one unit:  kubectl get all -n ecommerce
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ecommerce

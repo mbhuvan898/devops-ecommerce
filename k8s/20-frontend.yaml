@@ -1,0 +1,50 @@
+# The frontend pod serves the React build AND acts as the API gateway
+# (frontend/nginx.conf routes /api/v1/* paths to the right microservice).
+# Its Service is type LoadBalancer: on EKS, this provisions a Classic ELB
+# for it — that ELB's DNS name is your app's URL. No Ingress controller
+# needed yet (that's the natural next step — see README).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: ecommerce
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: REGISTRY/frontend:v1
+          ports:
+            - containerPort: 80
+          env:
+            # Same-origin: the SPA calls /api/v1 on its own host and the
+            # nginx inside this pod fans the request out to the services.
+            - name: API_URL
+              value: "/api/v1"
+          readinessProbe:
+            httpGet: { path: /, port: 80 }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { cpu: 300m, memory: 256Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: ecommerce
+spec:
+  type: LoadBalancer
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 80

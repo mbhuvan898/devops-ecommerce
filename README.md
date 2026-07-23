@@ -121,8 +121,48 @@ re-apply it, and restart the pods (`kubectl rollout restart deploy -n ecommerce`
 terraform -chdir=terraform destroy
 ```
 
+## CI/CD
+
+`.github/workflows/ci-cd.yml` runs on every push to `main` that touches
+`services/`, `frontend/`, or `k8s/` (or manually via `workflow_dispatch`):
+
+```
+push to main
+     │
+     ▼
+┌─────────────────────┐   one job per backend service (matrix)
+│  test-and-sonar      │   npm test --if-present → SonarQube scan
+└─────────┬────────────┘   (sonar-project.properties in each services/*/)
+          ▼
+┌─────────────────────┐   one job per service + frontend (matrix)
+│  build-scan-push     │   docker build → Trivy scan (SARIF → Security tab)
+└─────────┬────────────┘   → push to ECR (tagged with the commit SHA)
+          ▼
+┌─────────────────────┐
+│  deploy              │   kubectl set image on each Deployment in the
+└──────────────────────┘   ecommerce namespace → wait for rollout
+```
+
+**Auth is GitHub OIDC, not stored keys** (`terraform/github_oidc.tf`): the
+workflow assumes a short-lived, repo-scoped IAM role via
+`aws-actions/configure-aws-credentials`. No `AWS_ACCESS_KEY_ID`/`SECRET`
+is ever stored in this repo. EKS access for that role comes from an
+**access entry** (`aws_eks_access_entry`), the modern (2023+) replacement
+for hand-editing the `aws-auth` ConfigMap.
+
+**Required repo secrets** (Settings → Secrets and variables → Actions):
+
+| Secret | Where it comes from |
+|---|---|
+| `AWS_ROLE_ARN` | `terraform output github_actions_role_arn` (after `terraform apply`) |
+| `SONAR_TOKEN` | A SonarCloud project token for `mbhuvan898_devops-ecommerce_*` |
+
+The Trivy scan currently runs with `exit-code: "0"` (report-only, uploaded
+to the Security tab, doesn't block the pipeline) — flip it to `"1"` once
+the images are clean so a CRITICAL/HIGH finding actually blocks a deploy.
+
 ## Learning pointers
 
 - **Terraform**: each `.tf` file is commented. Start with `main.tf` → `vpc.tf` → `ecr.tf` → `eks.tf` → `docdb.tf`. `terraform plan` before every apply.
 - **Kubernetes**: `k8s/10-user-service.yaml` is commented as the reference — Deployment vs Service, probes, ConfigMap/Secret injection.
-- **Next steps to explore**: an Ingress controller (AWS Load Balancer Controller) instead of the LoadBalancer Service, a message queue (SQS/RabbitMQ) for stock events instead of the synchronous internal HTTP calls, HorizontalPodAutoscaler, CI/CD with Jenkins/GitHub Actions + SonarQube + Trivy scanning before the image push step.
+- **Next steps to explore**: an Ingress controller (AWS Load Balancer Controller) instead of the LoadBalancer Service, a message queue (SQS/RabbitMQ) for stock events instead of the synchronous internal HTTP calls, a HorizontalPodAutoscaler, gating the Trivy scan on severity, and GitOps (ArgoCD) instead of the pipeline pushing directly to the cluster.
